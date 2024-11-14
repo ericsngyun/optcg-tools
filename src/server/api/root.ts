@@ -1,4 +1,4 @@
-import { cardRouter } from "~/server/api/routers/post";
+import { cardRouter } from "~/server/api/routers/card";
 import { createCallerFactory, createTRPCRouter } from "~/server/api/trpc";
 
 /**

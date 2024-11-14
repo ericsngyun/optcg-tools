@@ -1,73 +1,103 @@
 generator client {
-  provider = "prisma-client-js"
+  provider        = "prisma-client-js"
+  previewFeatures = ["postgresqlExtensions"]
 }
 
 datasource db {
-  provider  = "postgresql"
-  url       = env("DATABASE_URL")
-  directUrl = env("DIRECT_URL")
-}
-
-model Card {
-  name    String?
-  id      String  
-  rarity  String?
-  type    String?
-  img_url String
-  power   String?
-  counter String?
-  color   String?
-  cost    String?
-  life    String?
-  feature String?
-  text    String?
-  set     String?
-
-  @@id([id, img_url], map: "cards_pkey")
+  provider   = "postgresql"
+  url        = env("DATABASE_URL")
+  directUrl  = env("DIRECT_URL")
+  extensions = [uuid_ossp(map: "uuid-ossp", schema: "extensions")]
 }
 
 model Account {
-    id                       String  @id @default(cuid())
-    userId                   String
-    type                     String
-    provider                 String
-    providerAccountId        String
-    refresh_token            String? // @db.Text
-    access_token             String? // @db.Text
-    expires_at               Int?
-    token_type               String?
-    scope                    String?
-    id_token                 String? // @db.Text
-    session_state            String?
-    user                     User    @relation(fields: [userId], references: [id], onDelete: Cascade)
-    refresh_token_expires_in Int?
+  id                       String  @id @default(cuid())
+  userId                   String
+  type                     String
+  provider                 String
+  providerAccountId        String
+  refresh_token            String?
+  access_token             String?
+  expires_at               Int?
+  token_type               String?
+  scope                    String?
+  id_token                 String?
+  session_state            String?
+  refresh_token_expires_in Int?
+  user                     User    @relation(fields: [userId], references: [id], onDelete: Cascade)
 
-    @@unique([provider, providerAccountId])
+  @@unique([provider, providerAccountId])
 }
 
 model Session {
-    id           String   @id @default(cuid())
-    sessionToken String   @unique
-    userId       String
-    expires      DateTime
-    user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  id           String   @id @default(cuid())
+  sessionToken String   @unique
+  userId       String
+  expires      DateTime
+  user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
 }
 
 model User {
-    id            String    @id @default(cuid())
-    name          String?
-    email         String?   @unique
-    emailVerified DateTime?
-    image         String?
-    accounts      Account[]
-    sessions      Session[]
-    // posts         Post[]
+  id            String    @id @default(cuid())
+  name          String?
+  email         String?   @unique
+  emailVerified DateTime?
+  image         String?
+  accounts      Account[]
+  sessions      Session[]
 }
 
 model VerificationToken {
-    identifier String
-    token      String   @unique
-    expires    DateTime
+  identifier String
+  token      String   @unique
+  expires    DateTime
 
-    @@unique([identifier, token])
+  @@unique([identifier, token])
+}
+
+/// This model contains row level security and requires additional setup for migrations. Visit https://pris.ly/d/row-level-security for more info.
+model Card {
+  id       String    @id(map: "cards_pkey") @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  name     String?
+  set      String?   @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  rarity   String?   @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  category String?   @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  effect   String?
+  power    Int?      @db.SmallInt
+  counter  Int?      @db.SmallInt
+  image    String?   @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  Category Category? @relation(fields: [category], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "cards_category_fkey")
+  Image    Image?    @relation(fields: [image], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "cards_image_fkey")
+  Rarity   Rarity?   @relation(fields: [rarity], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "cards_rarity_fkey")
+  Set      Set?      @relation(fields: [set], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "cards_set_fkey")
+}
+
+/// This model contains row level security and requires additional setup for migrations. Visit https://pris.ly/d/row-level-security for more info.
+model Category {
+  id            String @id(map: "categories_pkey") @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  category_name String
+  Card          Card[]
+}
+
+/// This model contains row level security and requires additional setup for migrations. Visit https://pris.ly/d/row-level-security for more info.
+model Image {
+  id         String  @id(map: "images_pkey") @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  image_url  String
+  image_name String?
+  Card       Card[]
+}
+
+/// This model contains row level security and requires additional setup for migrations. Visit https://pris.ly/d/row-level-security for more info.
+model Rarity {
+  id          String @id(map: "rarities_pkey") @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  rarity_name String
+  Card        Card[]
+}
+
+/// This model or at least one of its fields has comments in the database, and requires an additional setup for migrations: Read more: https://pris.ly/d/database-comments
+/// This model contains row level security and requires additional setup for migrations. Visit https://pris.ly/d/row-level-security for more info.
+model Set {
+  id       String @id(map: "sets_pkey") @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  set_name String
+  Card     Card[]
 }
