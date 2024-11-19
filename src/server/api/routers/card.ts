@@ -9,7 +9,7 @@ import {
 export const cardRouter = createTRPCRouter({
   getCards: publicProcedure.query(async ({ ctx }) => {
     const cards = await ctx.db.card.findMany({
-      take: 50,
+      take: 100,
       include: {
         Image: true,
         Category: true,
