@@ -11,7 +11,10 @@ export const cardRouter = createTRPCRouter({
     const cards = await ctx.db.card.findMany({
       take: 50,
       include: {
-        Image: true
+        Image: true,
+        Category: true,
+        Rarity: true,
+        Set: true,
       }
     });
     return cards;

@@ -1,21 +1,23 @@
 import React from "react";
+import type { Card, Category, Image, Rarity, Set} from "@prisma/client"
+
+type CardWithRelations = Card & {
+  Category: Category | null;
+  Image: Image | null;
+  Rarity: Rarity | null;
+  Set: Set | null;
+}
 
 type CardProps = {
-  card: {
-    id: string;
-    name: string;
-    imageUrl: string;
-    set: string;
-    rarity: string;
-    category: string;
-    power: number;
-    effect: string;
-    counter: number;
-  };
-};
+  card: CardWithRelations
+}
 
 const Card: React.FC<CardProps> = ({ card }) => {
-  return <div>Card</div>; 
+  return (
+    <div>
+      {card.name}
+    </div>
+  ); 
 };
 
 export default Card;
