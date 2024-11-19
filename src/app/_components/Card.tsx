@@ -9,6 +9,7 @@ import {
   DialogTrigger,
 } from "~/components/ui/dialog";
 import NextImage from "next/image";
+import { Badge } from "~/components/ui/badge";
 
 type CardWithRelations = Card & {
   Category: Category | null;
@@ -26,18 +27,34 @@ const Card: React.FC<CardProps> = ({ card }) => {
     <Dialog>
       <DialogTrigger>
         {card.Image?.image_url ? (
-          <NextImage src={card.Image.image_url} alt="card image" height={500} width={350}/>
+          <NextImage
+            src={card.Image.image_url}
+            alt="card image"
+            height={500}
+            width={250}
+          />
         ) : (
           <div>No image available</div>
         )}
       </DialogTrigger>
-      <DialogContent>
-        <DialogHeader>
-          <DialogTitle>{card.name}</DialogTitle>
-          <DialogDescription>
-            {card.effect}
-          </DialogDescription>
-        </DialogHeader>
+      <DialogContent className="w-full max-w-4xl rounded-lg border-r-2 bg-slate-200">
+        <div className="flex gap-2">
+          {card.Image?.image_url ? (
+            <NextImage
+              src={card.Image.image_url}
+              alt="card image"
+              height={500}
+              width={350}
+              className="max-w-full h-auto"
+            />
+          ) : (
+            <div>No image available</div>
+          )}
+          <DialogHeader>
+            <DialogTitle className="text-3xl">{card.name}</DialogTitle>
+            <DialogDescription>{card.effect}</DialogDescription>
+          </DialogHeader>
+        </div>
       </DialogContent>
     </Dialog>
   );
