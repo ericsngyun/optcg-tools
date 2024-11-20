@@ -10,6 +10,7 @@ import {
 } from "~/components/ui/dialog";
 import NextImage from "next/image";
 import { Badge } from "~/components/ui/badge";
+import { Separator } from "~/components/ui/separator";
 
 type CardWithRelations = Card & {
   Category: Category | null;
@@ -37,8 +38,8 @@ const Card: React.FC<CardProps> = ({ card }) => {
           <div>No image available</div>
         )}
       </DialogTrigger>
-      <DialogContent className="w-full max-w-4xl rounded-lg border-r-2 bg-slate-200">
-        <div className="flex gap-2">
+      <DialogContent className="w-full max-w-4xl rounded-lg border-r-2">
+        <div className="flex gap-4">
           {card.Image?.image_url ? (
             <NextImage
               src={card.Image.image_url}
@@ -50,22 +51,34 @@ const Card: React.FC<CardProps> = ({ card }) => {
           ) : (
             <div>No image available</div>
           )}
-          <DialogHeader className="gap-4">
-            <DialogTitle className="text-3xl">{card.name}</DialogTitle>
-            <DialogDescription className="text-xl">
-              <div className="grid grid-cols-3 gap-4">
+          <DialogHeader className="gap-2">
+            <DialogTitle className="text-3xl text-center w-full">{card.name}</DialogTitle>
+            <Separator />
+            <DialogDescription className="gap-2">
+              <div className="grid grid-cols-3 gap-4 p-2 sm:text-lg text-xl">
                 <div className="flex flex-col">
-                  <h1 className="font-bold text-slate-700">Power</h1>
+                  <h1 className="font-semibold text-slate-700">Power</h1>
                   <p>{card.power}</p>
                 </div>
                 <div className="flex flex-col">
-                  <h1 className="font-bold text-slate-700">Set</h1>
+                  <h1 className="font-semibold text-slate-700">Set</h1>
                   <p>{card.Set?.set_name}</p>
+                </div>
+                <div className="flex flex-col">
+                  <h1 className="font-semibold text-slate-700">Rarity</h1>
+                  <p>{card.Rarity?.rarity_name}</p>
+                </div>
+                <div className="flex flex-col">
+                  <h1 className="font-semibold text-slate-700">Type</h1>
+                  <p>{card.Category?.category_name}</p>
                 </div>
 
               </div>
-              
+              <Separator />
+              <div className="flex flex-col gap-2 text-xl">
+                <h1 className="text-slate-700 font-bold">Effect</h1>
                 {card.effect}
+              </div>
             </DialogDescription>
           </DialogHeader>
         </div>
