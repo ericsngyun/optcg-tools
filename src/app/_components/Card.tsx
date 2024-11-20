@@ -38,24 +38,25 @@ const Card: React.FC<CardProps> = ({ card }) => {
           <div>No image available</div>
         )}
       </DialogTrigger>
-      <DialogContent className="w-full max-w-4xl rounded-lg border-r-2">
+      <DialogContent className="w-full max-w-3xl rounded-lg border-r-2">
         <div className="flex gap-4">
           {card.Image?.image_url ? (
             <NextImage
               src={card.Image.image_url}
               alt="card image"
-              height={500}
-              width={350}
+              height={150}
+              width={150}
               className="max-w-full h-auto"
+              style={{ height: 'auto', width: '100%'}}
             />
           ) : (
             <div>No image available</div>
           )}
           <DialogHeader className="gap-2">
-            <DialogTitle className="text-3xl text-center w-full">{card.name}</DialogTitle>
+            <DialogTitle className="md:text-3xl text-xl text-center w-full">{card.name}</DialogTitle>
             <Separator />
             <DialogDescription className="gap-2">
-              <div className="grid grid-cols-3 gap-4 p-2 sm:text-lg text-xl">
+              <div className="grid grid-cols-3 gap-4 p-2 text-sm md:text-lg">
                 <div className="flex flex-col">
                   <h1 className="font-semibold text-slate-700">Power</h1>
                   <p>{card.power}</p>
@@ -75,7 +76,7 @@ const Card: React.FC<CardProps> = ({ card }) => {
 
               </div>
               <Separator />
-              <div className="flex flex-col gap-2 text-xl">
+              <div className="flex flex-col gap-2 text-xs md:text-lg">
                 <h1 className="text-slate-700 font-bold">Effect</h1>
                 {card.effect}
               </div>
