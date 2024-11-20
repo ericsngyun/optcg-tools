@@ -1,11 +1,16 @@
 import { type Config } from "tailwindcss";
 import { fontFamily } from "tailwindcss/defaultTheme";
+import tailwindcssAnimate from 'tailwindcss-animate'
+import tailwindcssForm from '@tailwindcss/forms'
 
 export default {
     darkMode: ["class"],
     content: ["./src/**/*.tsx"],
   theme: {
   	extend: {
+			clipPath: {
+				pointed : 'polygon(10% 0, 90% 0, 100% 50%, 90% 100%, 10% 100%, 0 50%)',
+			},
   		fontFamily: {
   			sans: ["var(--font-geist-sans)", ...fontFamily.sans]
   		},
@@ -58,5 +63,8 @@ export default {
   		}
   	}
   },
-  plugins: [require("tailwindcss-animate")],
+  plugins: [
+		tailwindcssAnimate,
+		tailwindcssForm
+	],
 } satisfies Config;

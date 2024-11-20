@@ -17,6 +17,6 @@ export const cardRouter = createTRPCRouter({
         Set: true,
       }
     });
-    return cards;
+    return cards
   }),
 });

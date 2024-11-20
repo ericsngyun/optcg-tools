@@ -50,9 +50,23 @@ const Card: React.FC<CardProps> = ({ card }) => {
           ) : (
             <div>No image available</div>
           )}
-          <DialogHeader>
+          <DialogHeader className="gap-4">
             <DialogTitle className="text-3xl">{card.name}</DialogTitle>
-            <DialogDescription>{card.effect}</DialogDescription>
+            <DialogDescription className="text-xl">
+              <div className="grid grid-cols-3 gap-4">
+                <div className="flex flex-col">
+                  <h1 className="font-bold text-slate-700">Power</h1>
+                  <p>{card.power}</p>
+                </div>
+                <div className="flex flex-col">
+                  <h1 className="font-bold text-slate-700">Set</h1>
+                  <p>{card.Set?.set_name}</p>
+                </div>
+
+              </div>
+              
+                {card.effect}
+            </DialogDescription>
           </DialogHeader>
         </div>
       </DialogContent>
