@@ -23,7 +23,7 @@ type CardProps = {
   card: CardWithRelations;
 };
 
-const Card: React.FC<CardProps> = ({ card }) => {
+const MyCard: React.FC<CardProps> = ({ card }) => {
   return (
     <Dialog>
       <DialogTrigger>
@@ -44,8 +44,8 @@ const Card: React.FC<CardProps> = ({ card }) => {
             <NextImage
               src={card.Image.image_url}
               alt="card image"
-              height={150}
-              width={150}
+              height={350}
+              width={350}
               className="max-w-full h-auto"
               style={{ height: 'auto', width: '100%'}}
             />
@@ -56,7 +56,7 @@ const Card: React.FC<CardProps> = ({ card }) => {
             <DialogTitle className="md:text-3xl text-xl text-center w-full">{card.name}</DialogTitle>
             <Separator />
             <DialogDescription className="gap-2">
-              <div className="grid grid-cols-3 gap-4 p-2 text-sm md:text-lg">
+              <div className="grid grid-cols-3 gap-4 p-2 text-sm md:text-lg–">
                 <div className="flex flex-col">
                   <h1 className="font-semibold text-slate-700">Power</h1>
                   <p>{card.power}</p>
@@ -76,7 +76,7 @@ const Card: React.FC<CardProps> = ({ card }) => {
 
               </div>
               <Separator />
-              <div className="flex flex-col gap-2 text-xs md:text-lg">
+              <div className="flex flex-col gap-2 text-xs md:text-lg max-w-2xl mt-2">
                 <h1 className="text-slate-700 font-bold">Effect</h1>
                 {card.effect}
               </div>
@@ -88,4 +88,4 @@ const Card: React.FC<CardProps> = ({ card }) => {
   );
 };
 
-export default Card;
+export default MyCard;
