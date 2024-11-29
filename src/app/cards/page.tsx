@@ -10,9 +10,12 @@ import {
   CardHeader,
   CardTitle,
 } from "~/components/ui/card";
+import { Form } from "~/components/ui/form";
 
 export default async function cards() {
-  const cards = await api.card.getCards();
+  const cards = await api.card.getCards()
+
+  // const cards = await api.card.
 
   return (
     <div className="mx-auto w-full max-w-screen-2xl px-2.5 md:px-12 lg:px-20 xl:px-28 space-y-12 py-12">
@@ -23,7 +26,9 @@ export default async function cards() {
           <CardDescription>Total Results: {cards.length}</CardDescription>
         </CardHeader>
         <CardContent>
-          
+          {/* <Form>
+
+          </Form> */}
         </CardContent>
       </Card>
       <div className="grid grid-cols-3 gap-2 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6">

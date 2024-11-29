@@ -56,20 +56,32 @@ model VerificationToken {
 }
 
 /// This model contains row level security and requires additional setup for migrations. Visit https://pris.ly/d/row-level-security for more info.
+/// The underlying table does not contain a valid unique identifier and can therefore currently not be handled by Prisma Client.
 model Card {
-  id       String    @id(map: "cards_pkey") @default(dbgenerated("gen_random_uuid()")) @db.Uuid
-  name     String?
-  set      String?   @default(dbgenerated("gen_random_uuid()")) @db.Uuid
-  rarity   String?   @default(dbgenerated("gen_random_uuid()")) @db.Uuid
-  category String?   @default(dbgenerated("gen_random_uuid()")) @db.Uuid
-  effect   String?
-  power    Int?      @db.SmallInt
-  counter  Int?      @db.SmallInt
-  image    String?   @default(dbgenerated("gen_random_uuid()")) @db.Uuid
-  Category Category? @relation(fields: [category], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "cards_category_fkey")
-  Image    Image?    @relation(fields: [image], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "cards_image_fkey")
-  Rarity   Rarity?   @relation(fields: [rarity], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "cards_rarity_fkey")
-  Set      Set?      @relation(fields: [set], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "cards_set_fkey")
+  id         String     @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  name       String
+  card_id    String?
+  set        String?    @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  rarity     String?    @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  category   String?    @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  effect     String?
+  power      Int?       @db.SmallInt
+  counter    Int?       @db.SmallInt
+  color      String?    @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  cost       Int?       @db.SmallInt
+  trigger    String?
+  life       Int?       @db.SmallInt
+  is_alt_art String?
+  type       String?    @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  attribute  String?    @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  image      String?    @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  Attribute  Attribute? @relation(fields: [attribute], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  Category   Category?  @relation(fields: [category], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "cards_category_fkey")
+  Color      Color?     @relation(fields: [color], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  Image      Image?     @relation(fields: [image], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "cards_image_fkey")
+  Rarity     Rarity?    @relation(fields: [rarity], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "cards_rarity_fkey")
+  Set        Set?       @relation(fields: [set], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "cards_set_fkey")
+  Type       Type?      @relation(fields: [type], references: [id], onDelete: NoAction, onUpdate: NoAction)
 }
 
 /// This model contains row level security and requires additional setup for migrations. Visit https://pris.ly/d/row-level-security for more info.
@@ -81,7 +93,7 @@ model Category {
 
 /// This model contains row level security and requires additional setup for migrations. Visit https://pris.ly/d/row-level-security for more info.
 model Image {
-  id         String  @id(map: "images_pkey") @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  id         String  @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
   image_url  String
   image_name String?
   Card       Card[]
@@ -100,4 +112,24 @@ model Set {
   id       String @id(map: "sets_pkey") @default(dbgenerated("gen_random_uuid()")) @db.Uuid
   set_name String
   Card     Card[]
+}
+
+/// This model contains row level security and requires additional setup for migrations. Visit https://pris.ly/d/row-level-security for more info.
+model Attribute {
+  id             String @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  attribute_name String
+  Card           Card[]
+}
+
+/// This model contains row level security and requires additional setup for migrations. Visit https://pris.ly/d/row-level-security for more info.
+model Color {
+  id         String @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  color_name String
+  Card       Card[]
+}
+
+model Type {
+  id        String @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  type_name String
+  Card      Card[]
 }

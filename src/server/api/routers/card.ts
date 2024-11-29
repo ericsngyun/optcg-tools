@@ -15,6 +15,9 @@ export const cardRouter = createTRPCRouter({
         Category: true,
         Rarity: true,
         Set: true,
+        Type: true,
+        Attribute: true,
+        Color: true,
       }
     });
     return cards

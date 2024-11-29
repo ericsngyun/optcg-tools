@@ -1,5 +1,5 @@
 import React from "react";
-import type { Card, Category, Image, Rarity, Set } from "@prisma/client";
+import type { Card, Category, Image, Rarity, Set, Color, Type, Attribute} from "@prisma/client";
 import {
   Dialog,
   DialogContent,
@@ -13,10 +13,13 @@ import { Badge } from "~/components/ui/badge";
 import { Separator } from "~/components/ui/separator";
 
 type CardWithRelations = Card & {
-  Category: Category | null;
-  Image: Image | null;
-  Rarity: Rarity | null;
-  Set: Set | null;
+  Category: Category;
+  Image: Image;
+  Rarity: Rarity;
+  Set: Set;
+  Color: Color;
+  Type: Type ;
+  Attribute: Attribute;
 };
 
 type CardProps = {
@@ -70,8 +73,12 @@ const MyCard: React.FC<CardProps> = ({ card }) => {
                   <p>{card.Rarity?.rarity_name}</p>
                 </div>
                 <div className="flex flex-col">
-                  <h1 className="font-semibold text-slate-700">Type</h1>
+                  <h1 className="font-semibold text-slate-700">Category</h1>
                   <p>{card.Category?.category_name}</p>
+                </div>
+                <div className="flex flex-col">
+                  <h1 className="font-semibold text-slate-700">Type</h1>
+                  <p>{}</p>
                 </div>
 
               </div>
