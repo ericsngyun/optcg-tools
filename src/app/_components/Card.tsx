@@ -13,12 +13,12 @@ import { Badge } from "~/components/ui/badge";
 import { Separator } from "~/components/ui/separator";
 
 type CardWithRelations = Card & {
-  Category: Category;
-  Image: Image;
-  Rarity: Rarity;
-  Set: Set;
+  Category: Category | null;
+  Image: Image | null;
+  Rarity: Rarity | null;
+  Set: Set | null;
   Color: Color;
-  Type: Type ;
+  Type: Type;
   Attribute: Attribute;
 };
 
@@ -49,7 +49,7 @@ const MyCard: React.FC<CardProps> = ({ card }) => {
               alt="card image"
               height={350}
               width={350}
-              className="max-w-full h-auto"
+              className="max-w-2xl h-auto"
               style={{ height: 'auto', width: '100%'}}
             />
           ) : (
@@ -85,7 +85,9 @@ const MyCard: React.FC<CardProps> = ({ card }) => {
               <Separator />
               <div className="flex flex-col gap-2 text-xs md:text-lg max-w-2xl mt-2">
                 <h1 className="text-slate-700 font-bold">Effect</h1>
-                {card.effect}
+                <p className="text-left">
+                 {card.effect}
+                </p>
               </div>
             </DialogDescription>
           </DialogHeader>

@@ -13,9 +13,7 @@ import {
 import { Form } from "~/components/ui/form";
 
 export default async function cards() {
-  const cards = await api.card.getCards()
-
-  // const cards = await api.card.
+  const cards = await api.card.getCards();
 
   return (
     <div className="mx-auto w-full max-w-screen-2xl px-2.5 md:px-12 lg:px-20 xl:px-28 space-y-12 py-12">
