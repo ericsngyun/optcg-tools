@@ -66,10 +66,26 @@ const MyCard: React.FC<CardProps> = ({ card }) => {
             <Separator />
             <DialogDescription className="gap-2">
               <div className="grid grid-cols-3 gap-4 p-2 text-sm md:text-lg–">
-                <div className="flex flex-col">
-                  <h1 className="font-semibold text-slate-700">Power</h1>
-                  <p>{card.power}</p>
-                </div>
+                {card.Category?.category_name == "CHARACTER" ? 
+                  (
+                    <div className="flex flex-col">
+                      <h1 className="font-semibold text-slate-700">Power</h1>
+                      <p>{card.power}</p>
+                    </div>
+                  )
+                  :
+                    null
+                }
+                {card.Category?.category_name == "CHARACTER" ? 
+                  (
+                    <div className="flex flex-col">
+                      <h1 className="font-semibold text-slate-700">Counter</h1>
+                      <p>{card.counter}</p>
+                    </div>
+                  )
+                  :
+                    null
+                }
                 <div className="flex flex-col">
                   <h1 className="font-semibold text-slate-700">Set</h1>
                   <p>{card.Set?.set_name}</p>
@@ -84,7 +100,7 @@ const MyCard: React.FC<CardProps> = ({ card }) => {
                 </div>
                 <div className="flex flex-col">
                   <h1 className="font-semibold text-slate-700">Type</h1>
-                  <p>{}</p>
+                  <p>{card.Type?.type_name}</p>
                 </div>
 
               </div>
