@@ -21,15 +21,15 @@ export const cardRouter = createTRPCRouter({
       },
       orderBy: [
         {
+          card_id: "asc" // Order by card_id first
+        },
+        {
           Color: {
-            color_name: "asc"
+            color_name: "asc" // Then order by color
           },
         },
         {
-          name: "asc"
-        },
-        {
-          is_alt_art: "asc"
+          is_alt_art: "asc" // Finally order by is_alt_art
         }
       ]
     });

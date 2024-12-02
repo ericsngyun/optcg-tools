@@ -1,17 +1,42 @@
 import React from 'react'
+import MaxWidthWrapper from './MaxWidthWrapper'
+import {
+  NavigationMenu,
+  NavigationMenuContent,
+  NavigationMenuIndicator,
+  NavigationMenuItem,
+  NavigationMenuLink,
+  NavigationMenuList,
+  NavigationMenuTrigger,
+  NavigationMenuViewport,
+} from "~/components/ui/navigation-menu"
+
 
 
 
 const NavBar = () => {
   return (
-    <div className="sticky top-0 z-50 w-full border-b border-border/40 bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 dark:border-border">
-      <div className="flex h-14 items-center px-4">
-        <h1>
-          OPTCG Tools
-        </h1>
-        
+    <MaxWidthWrapper>
+      <div className="sticky top-0 z-50 w-full border-b border-border/40 bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 dark:border-border">
+        <div className="flex h-14 items-center px-4 gap-6">
+          <h1 className="text-2xl font-bold">
+            OPTCG Tools
+          </h1>
+          <div>
+            <NavigationMenu>
+              <NavigationMenuList>
+                <NavigationMenuItem>
+                  <NavigationMenuTrigger>Cards</NavigationMenuTrigger>
+                </NavigationMenuItem>
+              </NavigationMenuList>
+            </NavigationMenu>
+          </div>
+          <div>
+            other
+          </div>
+        </div>
       </div>
-    </div>
+    </MaxWidthWrapper>
   )
 }
 
