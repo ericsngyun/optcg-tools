@@ -27,6 +27,22 @@ const NavBar = () => {
               <NavigationMenuList>
                 <NavigationMenuItem>
                   <NavigationMenuTrigger>Cards</NavigationMenuTrigger>
+                  <NavigationMenuContent>
+                    <NavigationMenuLink>Card List</NavigationMenuLink>
+                  </NavigationMenuContent>
+                </NavigationMenuItem>
+                <NavigationMenuItem>
+                  <NavigationMenuTrigger>Decks</NavigationMenuTrigger>
+                  <NavigationMenuContent>
+                    <NavigationMenuLink>Meta Decks</NavigationMenuLink>
+                    <NavigationMenuLink>Deck Lists</NavigationMenuLink>
+                  </NavigationMenuContent>
+                </NavigationMenuItem>
+                <NavigationMenuItem>
+                  <NavigationMenuTrigger>Tournament</NavigationMenuTrigger>
+                  <NavigationMenuContent>
+                    <NavigationMenuLink>Latest Tournament Results</NavigationMenuLink>
+                  </NavigationMenuContent>
                 </NavigationMenuItem>
               </NavigationMenuList>
             </NavigationMenu>

@@ -65,6 +65,8 @@
   }
   body {
     @apply bg-background text-foreground;
+    background-image: url('/Users/ericyun/code-stuff/bustertools/public/background.png');
+    background-size: cover
   }
 }
 
