@@ -1,5 +1,4 @@
 import React from "react";
-import type { Card, Category, Image, Rarity, Set, Color, Type, Attribute} from "@prisma/client";
 import {
   Dialog,
   DialogContent,
@@ -12,14 +11,21 @@ import NextImage from "next/image";
 import { Badge } from "~/components/ui/badge";
 import { Separator } from "~/components/ui/separator";
 
-type CardWithRelations = Card & {
-  Category: Category | null;
-  Image: Image | null;
-  Rarity: Rarity | null;
-  Set: Set | null;
-  Color: Color;
-  Type: Type;
-  Attribute: Attribute;
+// Update the CardWithRelations type definition to allow Color to be null
+type CardWithRelations = {
+  Category: { id: string; category_name: string; } | null;
+  Image: { id: string; image_url: string; image_name: string | null; } | null;
+  Rarity: { id: string; rarity_name: string; } | null;
+  Set: { id: string; set_name: string} | null;
+  Attribute: { id: string; attribute_name: string } | null;
+  Color: { id: string; color_name: string; } | null; // Allow null
+  Type: { id: string; type_name: string} | null;
+  power: number | null;
+  effect: string | null;
+  name: string | null;
+  card_id: string | null;
+  counter: number | null;
+
 };
 
 type CardProps = {
