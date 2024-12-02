@@ -13,4 +13,6 @@ export function effect_change( effect: string ) {
     {text: 'Once per turn', color: 'bg-red-400'},
     {text: 'Double Attack', color: 'test'}
   ]
+
+  
 }

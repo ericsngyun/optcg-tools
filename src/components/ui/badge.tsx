@@ -15,6 +15,18 @@ const badgeVariants = cva(
         destructive:
           "border-transparent bg-destructive text-destructive-foreground shadow hover:bg-destructive/80",
         outline: "text-foreground",
+        activatemain: 
+          "border-transparent bg-blue-700 text-primary-foreground shadow hover:bg-primary/80",
+        donx:
+          "border-transparent bg-slate-900 text-primary-foreground",
+        blocker:
+          "border-transparent bg-orange-700 text-primary-foreground",
+        doubleattack:
+          "border-transparent bg-orange-700 text-primary-foreground",
+        onplay:
+          "border-transparent bg-blue-700 text-primary-foreground shadow hover:bg-primary/80",
+        main:
+          "border-transparent bg-blue-700 text-primary-foreground shadow hover:bg-primary/80",
       },
     },
     defaultVariants: {

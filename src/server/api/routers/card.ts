@@ -27,6 +27,9 @@ export const cardRouter = createTRPCRouter({
         },
         {
           name: "asc"
+        },
+        {
+          is_alt_art: "asc"
         }
       ]
     });
