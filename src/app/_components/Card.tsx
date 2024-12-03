@@ -119,4 +119,6 @@ const MyCard: React.FC<CardProps> = ({ card }) => {
   );
 };
 
+
+
 export default MyCard;
