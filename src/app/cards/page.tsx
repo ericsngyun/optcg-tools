@@ -1,6 +1,6 @@
+'use client'
 import React from "react";
-import { api, HydrateClient } from "~/trpc/server";
-import MaxWidthWrapper from "../_components/MaxWidthWrapper";
+import { api } from "~/trpc/react";
 import MyCard from "../_components/Card";
 import {
   Card,
@@ -10,10 +10,9 @@ import {
   CardHeader,
   CardTitle,
 } from "~/components/ui/card";
-import { Form } from "~/components/ui/form";
 
-export default async function cards() {
-  const cards = await api.card.getCards();
+export default function Cards() {
+  const { data: cards } = api.card.getCards.useQuery();
 
   return (
     <div className="mx-auto w-full max-w-screen-2xl px-2.5 md:px-12 lg:px-20 xl:px-28 space-y-12 py-12">
@@ -21,7 +20,7 @@ export default async function cards() {
       <Card className="">
         <CardHeader>
           <CardTitle>Card List</CardTitle>
-          <CardDescription>Total Results: {cards.length}</CardDescription>
+          <CardDescription>Total Results: {cards?.length ?? 0}</CardDescription>
         </CardHeader>
         <CardContent>
           {/* <Form>
@@ -30,7 +29,7 @@ export default async function cards() {
         </CardContent>
       </Card>
       <div className="grid grid-cols-3 gap-2 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6">
-        {cards?.map((card) => <MyCard key={card.id} card={card} />)}
+        {cards?.map((card) => <MyCard key={card.id} card={card}/>)}
       </div>
     </div>
   );

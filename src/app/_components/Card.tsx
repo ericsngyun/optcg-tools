@@ -47,7 +47,7 @@ const MyCard: React.FC<CardProps> = ({ card }) => {
           <div>No image available</div>
         )}
       </DialogTrigger>
-      <DialogContent className="w-full max-w-3xl rounded-lg border-r-2">
+      <DialogContent className="w-full max-w-4xl rounded-lg border-r-2">
         <div className="flex gap-4">
           {card.Image?.image_url ? (
             <NextImage
@@ -55,17 +55,16 @@ const MyCard: React.FC<CardProps> = ({ card }) => {
               alt="card image"
               height={350}
               width={350}
-              className="max-w-2xl h-auto"
-              style={{ height: 'auto', width: '100%'}}
+              style={{ height: 'auto', width: '60%'}}
             />
           ) : (
             <div>No image available</div>
           )}
           <DialogHeader className="gap-2">
-            <DialogTitle className="md:text-3xl text-xl text-center w-full">{card.name}</DialogTitle>
+            <DialogTitle className="md:text-3xl text-xl text-center w-full ">{card.name}</DialogTitle>
             <Separator />
-            <DialogDescription className="gap-2">
-              <div className="grid grid-cols-3 gap-4 p-2 text-sm md:text-lg–">
+            <DialogDescription>
+              <div className="grid grid-cols-3 gap-4 p-2 text-base md:text-lg–">
                 {card.Category?.category_name == "CHARACTER" ? 
                   (
                     <div className="flex flex-col">
@@ -98,11 +97,16 @@ const MyCard: React.FC<CardProps> = ({ card }) => {
                   <h1 className="font-semibold text-slate-700">Category</h1>
                   <p>{card.Category?.category_name}</p>
                 </div>
-                <div className="flex flex-col">
-                  <h1 className="font-semibold text-slate-700">Type</h1>
-                  <p>{card.Type?.type_name}</p>
-                </div>
-
+                {card.Category?.category_name == "CHARACTER" || card.Category?.category_name == "EVENT" || card.Category?.category_name == "STAGE" || card.Category?.category_name == "Leader" ? 
+                  (
+                    <div className="flex flex-col">
+                      <h1 className="font-semibold text-slate-700">Type</h1>
+                      <p>{card.Category?.category_name}</p>
+                    </div>
+                  )
+                  :
+                    null
+                }
               </div>
               <Separator />
               <div className="flex flex-col gap-2 text-xs md:text-lg max-w-2xl mt-2">

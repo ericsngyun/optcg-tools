@@ -11,6 +11,7 @@ import {
   NavigationMenuViewport,
 } from "~/components/ui/navigation-menu"
 import { cn } from '~/lib/utils'
+import Link from 'next/link'
 
 
 
@@ -21,7 +22,7 @@ const NavBar = () => {
       <div className="sticky top-0 z-50 w-full border-b">
         <div className="flex h-14 items-center px-4 gap-6">
           <h1 className="text-2xl font-bold">
-            OPTCG Tools
+            <Link href="/">OPTCG Tools</Link>
           </h1>
           <div>
             <NavigationMenu>
