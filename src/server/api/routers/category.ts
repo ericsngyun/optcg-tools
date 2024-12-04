@@ -3,9 +3,9 @@ import {
   publicProcedure,
 } from "~/server/api/trpc";
 
-export const setRouter = createTRPCRouter({
+export const categoryRouter = createTRPCRouter({
   getSets: publicProcedure.query(async ({ ctx }) => {
-    const sets = await ctx.db.set.findMany();
-    return sets;
+    const categories= await ctx.db.category.findMany();
+    return categories;
   }),
 });
