@@ -1,5 +1,5 @@
 'use client'
-import React from "react";
+import React, { useState } from "react";
 import { api } from "~/trpc/react";
 import MyCard from "../_components/Card";
 import {
@@ -12,6 +12,15 @@ import {
 } from "~/components/ui/card";
 import { Select, SelectContent, SelectGroup, SelectItem, SelectLabel, SelectTrigger, SelectValue } from "~/components/ui/select";
 
+type FilterState = {
+  sets: string | null;
+  attribute: string | null;
+  type: string | null;
+  category: string | null;
+  color: string | null;
+  rarity: string | null;
+}
+
 export default function Cards() {
   const { data: cards } = api.card.getCards.useQuery();
   const { data: sets } = api.set.getSets.useQuery();
@@ -21,11 +30,47 @@ export default function Cards() {
   const { data: color } = api.color.getColors.useQuery()
   const { data: rarity } = api.rarity.getRarity.useQuery()
 
+  const [filterState, setFilterState] = useState<FilterState>({
+    sets: null,
+    attribute: null,
+    type: null,
+    category: null,
+    color: null,
+    rarity: null,
+  });
+
   const selectGroup = [sets, attribute, type, category, color, rarity];
   console.log(selectGroup)
 
   // First, add labels for each group
   const selectLabels = ["Sets", "Attributes", "Types", "Categories", "Colors", "Rarities"];
+
+  const labelToKey: Record<string, keyof FilterState> = {
+    sets: 'sets',
+    attributes: 'attribute',
+    types: 'type',
+    categories: 'category',
+    colors: 'color',
+    rarities: 'rarity'
+  };
+
+  const handleSelectChange = (key: keyof FilterState, value: string) => {
+    setFilterState((prev) => ({
+      ...prev,
+      [key]: prev[key] === value ? null : value,
+    }));
+  };
+
+  const filteredCards = cards?.filter(card => {
+    return(
+      (filterState.sets ? card.set === filterState.sets : true) &&
+      (filterState.attribute ? card.attribute === filterState.attribute : true) &&
+      (filterState.type ? card.type === filterState.type : true) &&
+      (filterState.category ? card.category === filterState.category : true) &&
+      (filterState.color ? card.color === filterState.color : true) &&
+      (filterState.rarity ? card.rarity === filterState.rarity : true)
+    )
+  })
   
   return (
     <div className="mx-auto w-full max-w-screen-2xl px-2.5 md:px-12 lg:px-20 xl:px-28 space-y-12 py-12">
@@ -34,13 +79,19 @@ export default function Cards() {
         <CardHeader>
           <CardTitle>Card List</CardTitle>
           <CardDescription>
-            Total Results: {cards?.length ?? 0}
+            Total Results: {filteredCards?.length ?? 0}
           </CardDescription>
         </CardHeader>
         <CardContent>
           <div className="grid grid-cols-4 grid-flow-col gap-4">
             {selectGroup.map((group, index) => (
-              <Select key={index}>
+              <Select 
+                key={index} 
+                onValueChange={(value) => handleSelectChange(
+                  labelToKey[selectLabels[index]!.toLowerCase()]!, 
+                  value
+                )}
+              >
                 <SelectTrigger className="w-[180px]">
                   <SelectValue placeholder={`Select ${selectLabels[index]}`} />
                 </SelectTrigger>
@@ -60,7 +111,7 @@ export default function Cards() {
         </CardContent>
       </Card>
       <div className="grid grid-cols-3 gap-2 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6">
-        {cards?.map((card) => <MyCard key={card.id} card={card}/>)}
+        {filteredCards?.map((card) => <MyCard key={card.id} card={card}/>)}
       </div>
     </div>
   );
