@@ -13,19 +13,18 @@ import { Separator } from "~/components/ui/separator";
 
 // Update the CardWithRelations type definition to allow Color to be null
 type CardWithRelations = {
-  Category: { id: string; category_name: string; } | null;
+  Category: { id: string; name: string; } | null;
   Image: { id: string; image_url: string; image_name: string | null; } | null;
-  Rarity: { id: string; rarity_name: string; } | null;
-  Set: { id: string; set_name: string} | null;
-  Attribute: { id: string; attribute_name: string } | null;
-  Color: { id: string; color_name: string; } | null; // Allow null
-  Type: { id: string; type_name: string} | null;
+  Rarity: { id: string; name: string; } | null;
+  Set: { id: string; name: string; } | null;
+  Attribute: { id: string; name: string; } | null;
+  Color: { id: string; name: string; } | null;
+  Type: { id: string; name: string; } | null;
   power: number | null;
   effect: string | null;
   name: string | null;
   card_id: string | null;
   counter: number | null;
-
 };
 
 type CardProps = {
@@ -65,7 +64,7 @@ const MyCard: React.FC<CardProps> = ({ card }) => {
             <Separator />
             <DialogDescription>
               <div className="grid grid-cols-3 gap-4 p-2 text-base md:text-lg–">
-                {card.Category?.category_name == "CHARACTER" ? 
+                {card.Category?.name == "CHARACTER" ? 
                   (
                     <div className="flex flex-col">
                       <h1 className="font-semibold text-slate-700">Power</h1>
@@ -75,7 +74,7 @@ const MyCard: React.FC<CardProps> = ({ card }) => {
                   :
                     null
                 }
-                {card.Category?.category_name == "CHARACTER" ? 
+                {card.Category?.name == "CHARACTER" ? 
                   (
                     <div className="flex flex-col">
                       <h1 className="font-semibold text-slate-700">Counter</h1>
@@ -87,21 +86,21 @@ const MyCard: React.FC<CardProps> = ({ card }) => {
                 }
                 <div className="flex flex-col">
                   <h1 className="font-semibold text-slate-700">Set</h1>
-                  <p>{card.Set?.set_name}</p>
+                  <p>{card.Set?.name}</p>
                 </div>
                 <div className="flex flex-col">
                   <h1 className="font-semibold text-slate-700">Rarity</h1>
-                  <p>{card.Rarity?.rarity_name}</p>
+                  <p>{card.Rarity?.name}</p>
                 </div>
                 <div className="flex flex-col">
                   <h1 className="font-semibold text-slate-700">Category</h1>
-                  <p>{card.Category?.category_name}</p>
+                  <p>{card.Category?.name}</p>
                 </div>
-                {card.Category?.category_name == "CHARACTER" || card.Category?.category_name == "EVENT" || card.Category?.category_name == "STAGE" || card.Category?.category_name == "Leader" ? 
+                {card.Category?.name == "CHARACTER" || card.Category?.name == "EVENT" || card.Category?.name == "STAGE" || card.Category?.name == "Leader" ? 
                   (
                     <div className="flex flex-col">
                       <h1 className="font-semibold text-slate-700">Type</h1>
-                      <p>{card.Category?.category_name}</p>
+                      <p>{card.Category?.name}</p>
                     </div>
                   )
                   :

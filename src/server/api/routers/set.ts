@@ -8,7 +8,11 @@ import {
 
 export const setRouter = createTRPCRouter({
   getSets: publicProcedure.query(async ({ ctx }) => {
-    const sets = await ctx.db.set.findMany();
+    const sets = await ctx.db.set.findMany({
+      orderBy: {
+        name: "asc"
+      }
+    });
     return sets;
   }),
 });
