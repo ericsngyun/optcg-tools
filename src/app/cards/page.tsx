@@ -39,8 +39,10 @@ export default function Cards() {
     rarity: null,
   });
 
+  // Add this to track the selected values
+  const [selectedValues, setSelectedValues] = useState<Record<string, string>>({});
+
   const selectGroup = [sets, attribute, type, category, color, rarity];
-  console.log(selectGroup)
 
   // First, add labels for each group
   const selectLabels = ["Sets", "Attributes", "Types", "Categories", "Colors", "Rarities"];
@@ -55,7 +57,19 @@ export default function Cards() {
   };
 
   const handleSelectChange = (key: keyof FilterState, value: string) => {
-    setFilterState((prev) => ({
+    // Update selected values
+    setSelectedValues(prev => {
+      const newValues = { ...prev };
+      if (prev[key] === value) {
+        delete newValues[key]; // Remove if same value selected
+      } else {
+        newValues[key] = value; // Add new value
+      }
+      return newValues;
+    });
+
+    // Update filter state
+    setFilterState(prev => ({
       ...prev,
       [key]: prev[key] === value ? null : value,
     }));
@@ -87,6 +101,7 @@ export default function Cards() {
             {selectGroup.map((group, index) => (
               <Select 
                 key={index} 
+                value={selectedValues[labelToKey[selectLabels[index]!.toLowerCase()]!]}
                 onValueChange={(value) => handleSelectChange(
                   labelToKey[selectLabels[index]!.toLowerCase()]!, 
                   value
