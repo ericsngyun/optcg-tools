@@ -97,7 +97,7 @@ export default function Cards() {
           </CardDescription>
         </CardHeader>
         <CardContent>
-          <div className="grid grid-cols-4 grid-flow-col gap-4">
+          <div className="grid grid-cols-3 gap-4">
             {selectGroup.map((group, index) => (
               <Select 
                 key={index} 
@@ -107,7 +107,7 @@ export default function Cards() {
                   value
                 )}
               >
-                <SelectTrigger className="w-[180px]">
+                <SelectTrigger className="w-auto">
                   <SelectValue placeholder={`Select ${selectLabels[index]}`} />
                 </SelectTrigger>
                 <SelectContent>
