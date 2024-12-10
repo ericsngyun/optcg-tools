@@ -62,16 +62,21 @@ export default function Cards() {
       const newValues = { ...prev };
       if (prev[key] === value) {
         delete newValues[key]; // Remove if same value selected
-      } else {
-        newValues[key] = value; // Add new value
+        // Also update filter state immediately for deselection
+        setFilterState(prevFilter => ({
+          ...prevFilter,
+          [key]: null
+        }));
+        return newValues;
       }
+      newValues[key] = value; // Add new value
       return newValues;
     });
 
-    // Update filter state
+    // Only update filter state for new selections
     setFilterState(prev => ({
       ...prev,
-      [key]: prev[key] === value ? null : value,
+      [key]: value,
     }));
   };
 
@@ -101,7 +106,8 @@ export default function Cards() {
             {selectGroup.map((group, index) => (
               <Select 
                 key={index} 
-                value={selectedValues[labelToKey[selectLabels[index]!.toLowerCase()]!]}
+                value={selectedValues[labelToKey[selectLabels[index]!.toLowerCase()]!] ?? undefined}
+                defaultValue={selectedValues[labelToKey[selectLabels[index]!.toLowerCase()]!] ?? undefined}
                 onValueChange={(value) => handleSelectChange(
                   labelToKey[selectLabels[index]!.toLowerCase()]!, 
                   value
