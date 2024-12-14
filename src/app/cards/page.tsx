@@ -43,7 +43,6 @@ export default function Cards() {
   });
 
   const selectGroup = [sets, attribute, type, category, color, rarity];
-  console.log(selectGroup)
 
   // First, add labels for each group
   const selectLabels = ["Set", "Attribute", "Type", "Category", "Color", "Rarity"];
@@ -64,14 +63,28 @@ export default function Cards() {
     }));
   };
 
+  const handleSearchChange = (value: string) => {
+    setFilterState((prev) => ({
+      ...prev,
+      search: value,
+    }))
+
+    console.log(filterState)
+  }
+
   const filteredCards = cards?.filter(card => {
+    const searchTerm = filterState.search?.toLowerCase();
     return(
       (filterState.sets ? card.set === filterState.sets : true) &&
       (filterState.attribute ? card.attribute === filterState.attribute : true) &&
       (filterState.type ? card.type === filterState.type : true) &&
       (filterState.category ? card.category === filterState.category : true) &&
       (filterState.color ? card.color === filterState.color : true) &&
-      (filterState.rarity ? card.rarity === filterState.rarity : true)
+      (filterState.rarity ? card.rarity === filterState.rarity : true) &&
+      (searchTerm ? 
+        (card.name?.toLowerCase().includes(searchTerm) || 
+         card.card_id?.toLowerCase().includes(searchTerm))
+        : true)
     )
   })
   
@@ -87,7 +100,11 @@ export default function Cards() {
         </CardHeader>
         <CardContent>
           <div className="space-y-4">
-            <Input type="text" placeholder="Name/Code"/>
+            <Input 
+              onChange={(e) => handleSearchChange(e.target.value)} 
+              type="text" 
+              placeholder="Name/Code"
+            />
             <div className="grid grid-cols-3 gap-4">
               {selectGroup.map((group, index) => (
                 <Select 
