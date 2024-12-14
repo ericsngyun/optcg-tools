@@ -11,6 +11,7 @@ import {
   CardTitle,
 } from "~/components/ui/card";
 import { Select, SelectContent, SelectGroup, SelectItem, SelectLabel, SelectTrigger, SelectValue } from "~/components/ui/select";
+import { Input } from "~/components/ui/input";
 
 type FilterState = {
   sets: string | null;
@@ -19,6 +20,7 @@ type FilterState = {
   category: string | null;
   color: string | null;
   rarity: string | null;
+  search: string | null;
 }
 
 export default function Cards() {
@@ -37,46 +39,28 @@ export default function Cards() {
     category: null,
     color: null,
     rarity: null,
+    search: null,
   });
 
-  // Add this to track the selected values
-  const [selectedValues, setSelectedValues] = useState<Record<string, string>>({});
-
   const selectGroup = [sets, attribute, type, category, color, rarity];
+  console.log(selectGroup)
 
   // First, add labels for each group
-  const selectLabels = ["Sets", "Attributes", "Types", "Categories", "Colors", "Rarities"];
+  const selectLabels = ["Set", "Attribute", "Type", "Category", "Color", "Rarity"];
 
   const labelToKey: Record<string, keyof FilterState> = {
-    sets: 'sets',
-    attributes: 'attribute',
+    set: 'sets',
+    attribute: 'attribute',
     types: 'type',
-    categories: 'category',
-    colors: 'color',
-    rarities: 'rarity'
+    category: 'category',
+    color: 'color',
+    rarity: 'rarity'
   };
 
   const handleSelectChange = (key: keyof FilterState, value: string) => {
-    // Update selected values
-    setSelectedValues(prev => {
-      const newValues = { ...prev };
-      if (prev[key] === value) {
-        delete newValues[key]; // Remove if same value selected
-        // Also update filter state immediately for deselection
-        setFilterState(prevFilter => ({
-          ...prevFilter,
-          [key]: null
-        }));
-        return newValues;
-      }
-      newValues[key] = value; // Add new value
-      return newValues;
-    });
-
-    // Only update filter state for new selections
-    setFilterState(prev => ({
+    setFilterState((prev) => ({
       ...prev,
-      [key]: value,
+      [key]: prev[key] === value ? null : value,
     }));
   };
 
@@ -102,32 +86,33 @@ export default function Cards() {
           </CardDescription>
         </CardHeader>
         <CardContent>
-          <div className="grid grid-cols-3 gap-4">
-            {selectGroup.map((group, index) => (
-              <Select 
-                key={index} 
-                value={selectedValues[labelToKey[selectLabels[index]!.toLowerCase()]!] ?? undefined}
-                defaultValue={selectedValues[labelToKey[selectLabels[index]!.toLowerCase()]!] ?? undefined}
-                onValueChange={(value) => handleSelectChange(
-                  labelToKey[selectLabels[index]!.toLowerCase()]!, 
-                  value
-                )}
-              >
-                <SelectTrigger className="w-auto">
-                  <SelectValue placeholder={`Select ${selectLabels[index]}`} />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectGroup>
-                    <SelectLabel>{selectLabels[index]}</SelectLabel>
-                    {Array.isArray(group) && group.map((value) => (
-                      <SelectItem key={value.id} value={value.id}>
-                        {value.name}
-                      </SelectItem>
-                    ))}
-                  </SelectGroup>
-                </SelectContent>
-              </Select>
-            ))}
+          <div className="space-y-4">
+            <Input type="text" placeholder="Name/Code"/>
+            <div className="grid grid-cols-3 gap-4">
+              {selectGroup.map((group, index) => (
+                <Select 
+                  key={index} 
+                  onValueChange={(value) => handleSelectChange(
+                    labelToKey[selectLabels[index]!.toLowerCase()]!, 
+                    value
+                  )}
+                >
+                  <SelectTrigger className="w-full">
+                    <SelectValue placeholder={`Select ${selectLabels[index]}`} />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectGroup>
+                      <SelectLabel>{selectLabels[index]}</SelectLabel>
+                      {Array.isArray(group) && group.map((value) => (
+                        <SelectItem key={value.id} value={value.id}>
+                          {value.name}
+                        </SelectItem>
+                      ))}
+                    </SelectGroup>
+                  </SelectContent>
+                </Select>
+              ))}
+            </div>
           </div>
         </CardContent>
       </Card>

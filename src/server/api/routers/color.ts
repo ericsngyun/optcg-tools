@@ -5,7 +5,11 @@ import {
 
 export const colorRouter = createTRPCRouter({
   getColors: publicProcedure.query(async ({ ctx }) => {
-    const colors = await ctx.db.color.findMany();
+    const colors = await ctx.db.color.findMany({
+      orderBy: {
+        name: "asc"
+      }
+    });
     return colors;
   }),
 });
