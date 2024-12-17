@@ -22,6 +22,8 @@ import {
 import { Input } from "~/components/ui/input";
 import debounce from "lodash/debounce";
 import { Skeleton } from "~/components/ui/skeleton";
+import { Button } from "~/components/ui/button";
+import { Trash2, XIcon } from "lucide-react";
 
 type FilterState = {
   sets: string | null;
@@ -202,7 +204,22 @@ export default function Cards() {
               />
             </div>
             <div className="grid grid-cols-3 gap-4">{selectOptions}</div>
+
+            <Button onClick={() => {setFilterState({
+              sets: null,
+              attribute: null,
+              type: null,
+              category: null,
+              color: null,
+              rarity: null,
+              search: null,
+              searcheffect: null,
+              })}}
+            >
+              Clear<XIcon/>
+            </Button>
           </div>
+          
         </CardContent>
       </Card>
       <div className="grid grid-cols-3 gap-2 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6">
