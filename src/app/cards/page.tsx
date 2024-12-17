@@ -24,6 +24,7 @@ import debounce from "lodash/debounce";
 import { Skeleton } from "~/components/ui/skeleton";
 import { Button } from "~/components/ui/button";
 import { Trash2, XIcon } from "lucide-react";
+import { toast } from "~/hooks/use-toast";
 
 type FilterState = {
   sets: string | null;
@@ -95,8 +96,8 @@ export default function Cards() {
           ...prev,
           search: value,
         }));
-      }, 300),
-    [], // Ensure it only initializes once
+      }, 150),
+    [],
   );
 
   useEffect(() => {
@@ -117,7 +118,7 @@ export default function Cards() {
           ...prev,
           searcheffect: value,
         }));
-      }, 300),
+      }, 150),
     [],
   );
 
@@ -199,6 +200,23 @@ export default function Cards() {
     setNameInput("");
     setEffectInput("");
     setSelectedValues({});
+    toast({
+      variant: "destructive",
+      title: "Cleared filters",
+    })
+  };
+
+  // Update the input handlers to be more responsive
+  const handleNameInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const value = e.target.value;
+    setNameInput(value); // Update UI immediately
+    debouncedSearch(value); // Debounce the filter update
+  };
+
+  const handleEffectInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const value = e.target.value;
+    setEffectInput(value); // Update UI immediately
+    debouncedEffectSearch(value); // Debounce the filter update
   };
 
   return (
@@ -216,19 +234,13 @@ export default function Cards() {
             <div className="grid grid-cols-2 gap-4">
               <Input
                 value={nameInput}
-                onChange={(e) => {
-                  setNameInput(e.target.value);
-                  handleSearchChange(e.target.value);
-                }}
+                onChange={handleNameInputChange}
                 type="text"
                 placeholder="Name/Code"
               />
               <Input
                 value={effectInput}
-                onChange={(e) => {
-                  setEffectInput(e.target.value);
-                  handleEffectSearchChange(e.target.value);
-                }}
+                onChange={handleEffectInputChange}
                 type="text"
                 placeholder="Effect"
               />
