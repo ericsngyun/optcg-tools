@@ -179,6 +179,28 @@ export default function Cards() {
     [selectGroup, handleSelectChange],
   );
 
+  // Add state for input values
+  const [nameInput, setNameInput] = useState("");
+  const [effectInput, setEffectInput] = useState("");
+  const [selectedValues, setSelectedValues] = useState<Record<string, string>>({});
+
+  // Update the clear function
+  const handleClear = () => {
+    setFilterState({
+      sets: null,
+      attribute: null,
+      type: null,
+      category: null,
+      color: null,
+      rarity: null,
+      search: null,
+      searcheffect: null,
+    });
+    setNameInput("");
+    setEffectInput("");
+    setSelectedValues({});
+  };
+
   return (
     <div className="mx-auto w-full max-w-screen-2xl space-y-12 px-2.5 py-12 md:px-12 lg:px-20 xl:px-28">
       {/* this is for the filter box */}
@@ -193,29 +215,27 @@ export default function Cards() {
           <div className="space-y-4">
             <div className="grid grid-cols-2 gap-4">
               <Input
-                onChange={(e) => handleSearchChange(e.target.value)}
+                value={nameInput}
+                onChange={(e) => {
+                  setNameInput(e.target.value);
+                  handleSearchChange(e.target.value);
+                }}
                 type="text"
                 placeholder="Name/Code"
               />
               <Input
-                onChange={(e) => handleEffectSearchChange(e.target.value)}
+                value={effectInput}
+                onChange={(e) => {
+                  setEffectInput(e.target.value);
+                  handleEffectSearchChange(e.target.value);
+                }}
                 type="text"
                 placeholder="Effect"
               />
             </div>
             <div className="grid grid-cols-3 gap-4">{selectOptions}</div>
 
-            <Button onClick={() => {setFilterState({
-              sets: null,
-              attribute: null,
-              type: null,
-              category: null,
-              color: null,
-              rarity: null,
-              search: null,
-              searcheffect: null,
-              })}}
-            >
+            <Button onClick={handleClear}>
               Clear<XIcon/>
             </Button>
           </div>
