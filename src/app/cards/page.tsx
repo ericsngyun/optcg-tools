@@ -21,6 +21,7 @@ import {
 } from "~/components/ui/select";
 import { Input } from "~/components/ui/input";
 import debounce from "lodash/debounce";
+import { Skeleton } from "~/components/ui/skeleton";
 
 type FilterState = {
   sets: string | null;
@@ -30,6 +31,7 @@ type FilterState = {
   color: string | null;
   rarity: string | null;
   search: string | null;
+  searcheffect: string | null;
 };
 
 const SELECT_LABELS = [
@@ -51,7 +53,7 @@ const labelToKey = {
 } as const;
 
 export default function Cards() {
-  const { data: cards, isLoading } = api.card.getCards.useQuery();
+  const { data: cards = [], isLoading } = api.card.getCards.useQuery();
   const { data: sets } = api.set.getSets.useQuery();
   const { data: attribute } = api.attribute.getAttributes.useQuery();
   const { data: type } = api.type.getTypes.useQuery();
@@ -67,6 +69,7 @@ export default function Cards() {
     color: null,
     rarity: null,
     search: null,
+    searcheffect: null,
   });
 
   const selectGroup = useMemo(() => [
@@ -104,9 +107,27 @@ export default function Cards() {
     debouncedSearch(value);
   };
 
+  // Add another debounced search for effect
+  const debouncedEffectSearch = useMemo(
+    () =>
+      debounce((value: string) => {
+        setFilterState((prev) => ({
+          ...prev,
+          searcheffect: value,
+        }));
+      }, 300),
+    [],
+  );
+
+  // Add handler for effect search
+  const handleEffectSearchChange = (value: string) => {
+    debouncedEffectSearch(value);
+  };
+
   const filteredCards = useMemo(() => 
     cards?.filter(card => {
       const searchTerm = filterState.search?.toLowerCase();
+      const effectTerm = filterState.searcheffect?.toLowerCase();
       return (
         (filterState.sets ? card.set === filterState.sets : true) &&
         (filterState.attribute ? card.attribute === filterState.attribute : true) &&
@@ -117,6 +138,9 @@ export default function Cards() {
         (searchTerm ? 
           (card.name?.toLowerCase().includes(searchTerm) || 
            card.card_id?.toLowerCase().includes(searchTerm))
+          : true) &&
+        (effectTerm ? 
+          card.effect?.toLowerCase().includes(effectTerm)
           : true)
       );
     }), [cards, filterState]
@@ -165,11 +189,18 @@ export default function Cards() {
         </CardHeader>
         <CardContent>
           <div className="space-y-4">
-            <Input
-              onChange={(e) => handleSearchChange(e.target.value)}
-              type="text"
-              placeholder="Name/Code"
-            />
+            <div className="grid grid-cols-2 gap-4">
+              <Input
+                onChange={(e) => handleSearchChange(e.target.value)}
+                type="text"
+                placeholder="Name/Code"
+              />
+              <Input
+                onChange={(e) => handleEffectSearchChange(e.target.value)}
+                type="text"
+                placeholder="Effect"
+              />
+            </div>
             <div className="grid grid-cols-3 gap-4">{selectOptions}</div>
           </div>
         </CardContent>
@@ -177,8 +208,8 @@ export default function Cards() {
       <div className="grid grid-cols-3 gap-2 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6">
       {isLoading ? (
         // Render skeleton loaders for each expected card
-        Array.from({ length: cards?.length || 6 }).map((_, index) => (
-          <div key={index} className="skeleton-card" />
+        Array.from({ length: cards?.length} || 6).map((_, index) => (
+          <Skeleton key={index} className="h-[125px]" />
         ))
       ) : (
         filteredCards?.map((card) => <MyCard key={card.id} card={card} />)
