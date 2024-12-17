@@ -51,7 +51,7 @@ const labelToKey = {
 } as const;
 
 export default function Cards() {
-  const { data: cards } = api.card.getCards.useQuery();
+  const { data: cards, isLoading } = api.card.getCards.useQuery();
   const { data: sets } = api.set.getSets.useQuery();
   const { data: attribute } = api.attribute.getAttributes.useQuery();
   const { data: type } = api.type.getTypes.useQuery();
@@ -71,7 +71,7 @@ export default function Cards() {
 
   const selectGroup = useMemo(() => [
     sets, attribute, type, category, color, rarity
-  ] as const, [sets, attribute, type, category, color, rarity]);
+  ] as const satisfies readonly ({ id: string; name: string; }[] | undefined)[], [sets, attribute, type, category, color, rarity]);
 
   const handleSelectChange = useCallback(
     (key: keyof Omit<FilterState, 'search'>, value: string) => {
@@ -129,7 +129,7 @@ export default function Cards() {
           key={index}
           onValueChange={(value) =>
             handleSelectChange(
-              labelToKey[SELECT_LABELS[index] as keyof typeof labelToKey],
+              labelToKey[SELECT_LABELS[index]!],
               value,
             )
           }
@@ -150,7 +150,7 @@ export default function Cards() {
           </SelectContent>
         </Select>
       )),
-    [selectGroup, SELECT_LABELS, handleSelectChange, labelToKey],
+    [selectGroup, handleSelectChange],
   );
 
   return (
@@ -175,8 +175,15 @@ export default function Cards() {
         </CardContent>
       </Card>
       <div className="grid grid-cols-3 gap-2 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6">
-        {filteredCards?.map((card) => <MyCard key={card.id} card={card} />)}
-      </div>
+      {isLoading ? (
+        // Render skeleton loaders for each expected card
+        Array.from({ length: cards?.length || 6 }).map((_, index) => (
+          <div key={index} className="skeleton-card" />
+        ))
+      ) : (
+        filteredCards?.map((card) => <MyCard key={card.id} card={card} />)
+      )}
+    </div>
     </div>
   );
 }
