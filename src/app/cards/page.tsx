@@ -93,7 +93,10 @@ export default function Cards() {
   }, [inView, fetchNextPage, hasNextPage, isFetchingNextPage]);
 
   // Flatten the pages array
-  const cards = data?.pages.flatMap((page) => page.items) ?? [];
+  const cards = useMemo(() => 
+    data?.pages.flatMap((page) => page.items) ?? [], 
+    [data?.pages]
+  );
 
   const { data: sets } = api.set.getSets.useQuery();
   const { data: attribute } = api.attribute.getAttributes.useQuery();
@@ -251,7 +254,7 @@ export default function Cards() {
       </Card>
       <div className="grid grid-cols-3 gap-2 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6">
         {isLoading ? (
-          Array.from({ length: 24 }).map((_, index) => (
+          Array.from({ length: 32 }).map((_, index) => (
             <Skeleton key={index} className="h-[250px]" />
           ))
         ) : (
@@ -261,7 +264,7 @@ export default function Cards() {
             ))}
             {isFetchingNextPage && (
               Array.from({ length: 24 }).map((_, index) => (
-                <Skeleton key={`loading-${index}`} className="h-[125px]" />
+                <Skeleton key={`loading-${index}`} className="h-[275px]" />
               ))
             )}
             <div ref={ref} className="col-span-full h-1" />
