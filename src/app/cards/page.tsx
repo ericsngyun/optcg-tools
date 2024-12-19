@@ -6,7 +6,6 @@ import {
   Card,
   CardContent,
   CardDescription,
-  CardFooter,
   CardHeader,
   CardTitle,
 } from "~/components/ui/card";
@@ -22,7 +21,7 @@ import {
 import { Input } from "~/components/ui/input";
 import { Skeleton } from "~/components/ui/skeleton";
 import { Button } from "~/components/ui/button";
-import { Trash2, XIcon } from "lucide-react";
+import { XIcon } from "lucide-react";
 import { toast } from "~/hooks/use-toast";
 import { useInView } from "react-intersection-observer";
 
@@ -77,7 +76,7 @@ export default function Cards() {
     isLoading,
   } = api.card.getCards.useInfiniteQuery(
     {
-      limit: 24,
+      limit: 32,
       ...filterState,
     },
     {
@@ -218,7 +217,7 @@ export default function Cards() {
   };
 
   return (
-    <div className="mx-auto w-full max-w-screen-2xl space-y-12 px-2.5 py-12 md:px-12 lg:px-20 xl:px-28">
+    <div className="mx-auto w-full max-w-screen-2xl space-y-8 px-2.5 py-6 md:px-12 lg:px-20 xl:px-28">
       {/* this is for the filter box */}
       <Card className="">
         <CardHeader>
@@ -252,7 +251,7 @@ export default function Cards() {
           
         </CardContent>
       </Card>
-      <div className="grid grid-cols-3 gap-2 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6">
+      <div className="grid grid-cols-4 gap-3 md:grid-cols-4 lg:grid-cols-6 xl:grid-cols-7">
         {isLoading ? (
           Array.from({ length: 32 }).map((_, index) => (
             <Skeleton key={index} className="h-[250px]" />
