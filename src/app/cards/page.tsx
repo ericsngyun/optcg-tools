@@ -20,11 +20,11 @@ import {
   SelectValue,
 } from "~/components/ui/select";
 import { Input } from "~/components/ui/input";
-import debounce from "lodash/debounce";
 import { Skeleton } from "~/components/ui/skeleton";
 import { Button } from "~/components/ui/button";
 import { Trash2, XIcon } from "lucide-react";
 import { toast } from "~/hooks/use-toast";
+import { useInView } from "react-intersection-observer";
 
 type FilterState = {
   sets: string | null;
@@ -56,13 +56,7 @@ const labelToKey = {
 } as const;
 
 export default function Cards() {
-  const { data: cards = [], isLoading } = api.card.getCards.useQuery();
-  const { data: sets } = api.set.getSets.useQuery();
-  const { data: attribute } = api.attribute.getAttributes.useQuery();
-  const { data: type } = api.type.getTypes.useQuery();
-  const { data: category } = api.category.getCategories.useQuery();
-  const { data: color } = api.color.getColors.useQuery();
-  const { data: rarity } = api.rarity.getRarity.useQuery();
+  const { ref, inView } = useInView();
 
   const [filterState, setFilterState] = useState<FilterState>({
     sets: null,
@@ -74,6 +68,39 @@ export default function Cards() {
     search: null,
     searcheffect: null,
   });
+
+  const {
+    data,
+    fetchNextPage,
+    hasNextPage,
+    isFetchingNextPage,
+    isLoading,
+  } = api.card.getCards.useInfiniteQuery(
+    {
+      limit: 24,
+      ...filterState,
+    },
+    {
+      getNextPageParam: (lastPage) => lastPage.nextCursor,
+    }
+  );
+
+  // Fetch next page when the last element comes into view
+  useEffect(() => {
+    if (inView && hasNextPage && !isFetchingNextPage) {
+      void fetchNextPage();
+    }
+  }, [inView, fetchNextPage, hasNextPage, isFetchingNextPage]);
+
+  // Flatten the pages array
+  const cards = data?.pages.flatMap((page) => page.items) ?? [];
+
+  const { data: sets } = api.set.getSets.useQuery();
+  const { data: attribute } = api.attribute.getAttributes.useQuery();
+  const { data: type } = api.type.getTypes.useQuery();
+  const { data: category } = api.category.getCategories.useQuery();
+  const { data: color } = api.color.getColors.useQuery();
+  const { data: rarity } = api.rarity.getRarity.useQuery();
 
   const selectGroup = useMemo(() => [
     sets, attribute, type, category, color, rarity
@@ -88,44 +115,6 @@ export default function Cards() {
     },
     [],
   );
-
-  const debouncedSearch = useMemo(
-    () =>
-      debounce((value: string) => {
-        setFilterState((prev) => ({
-          ...prev,
-          search: value,
-        }));
-      }, 150),
-    [],
-  );
-
-  useEffect(() => {
-    return () => {
-      debouncedSearch.cancel(); // Cleanup on unmount
-    };
-  }, [debouncedSearch]);
-  
-  const handleSearchChange = (value: string) => {
-    debouncedSearch(value);
-  };
-
-  // Add another debounced search for effect
-  const debouncedEffectSearch = useMemo(
-    () =>
-      debounce((value: string) => {
-        setFilterState((prev) => ({
-          ...prev,
-          searcheffect: value,
-        }));
-      }, 150),
-    [],
-  );
-
-  // Add handler for effect search
-  const handleEffectSearchChange = (value: string) => {
-    debouncedEffectSearch(value);
-  };
 
   const filteredCards = useMemo(() => 
     cards?.filter(card => {
@@ -209,14 +198,20 @@ export default function Cards() {
   // Update the input handlers to be more responsive
   const handleNameInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const value = e.target.value;
-    setNameInput(value); // Update UI immediately
-    debouncedSearch(value); // Debounce the filter update
+    setNameInput(value);
+    setFilterState(prev => ({
+      ...prev,
+      search: value,
+    }));
   };
 
   const handleEffectInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const value = e.target.value;
-    setEffectInput(value); // Update UI immediately
-    debouncedEffectSearch(value); // Debounce the filter update
+    setEffectInput(value);
+    setFilterState(prev => ({
+      ...prev,
+      searcheffect: value,
+    }));
   };
 
   return (
@@ -255,15 +250,24 @@ export default function Cards() {
         </CardContent>
       </Card>
       <div className="grid grid-cols-3 gap-2 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6">
-      {isLoading ? (
-        // Render skeleton loaders for each expected card
-        Array.from({ length: cards?.length} || 6).map((_, index) => (
-          <Skeleton key={index} className="h-[125px]" />
-        ))
-      ) : (
-        filteredCards?.map((card) => <MyCard key={card.id} card={card} />)
-      )}
-    </div>
+        {isLoading ? (
+          Array.from({ length: 24 }).map((_, index) => (
+            <Skeleton key={index} className="h-[250px]" />
+          ))
+        ) : (
+          <>
+            {cards.map((card) => (
+              <MyCard key={card.id} card={card} />
+            ))}
+            {isFetchingNextPage && (
+              Array.from({ length: 24 }).map((_, index) => (
+                <Skeleton key={`loading-${index}`} className="h-[125px]" />
+              ))
+            )}
+            <div ref={ref} className="col-span-full h-1" />
+          </>
+        )}
+      </div>
     </div>
   );
 }

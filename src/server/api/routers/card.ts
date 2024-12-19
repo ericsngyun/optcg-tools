@@ -7,31 +7,69 @@ import {
 } from "~/server/api/trpc";
 
 export const cardRouter = createTRPCRouter({
-  getCards: publicProcedure.query(async ({ ctx }) => {
-    const cards = await ctx.db.card.findMany({
-      include: {
-        Image: true,
-        Category: true,
-        Rarity: true,
-        Set: true,
-        Type: true,
-        Attribute: true,
-        Color: true,
-      },
-      orderBy: [
-        {
-          card_id: "asc" // Order by card_id first
+  getCards: publicProcedure
+    .input(
+      z.object({
+        limit: z.number().min(1).max(100).default(24),
+        cursor: z.string().nullish(),
+        // Add filter inputs
+        sets: z.string().nullish(),
+        attribute: z.string().nullish(),
+        type: z.string().nullish(),
+        category: z.string().nullish(),
+        color: z.string().nullish(),
+        rarity: z.string().nullish(),
+        search: z.string().nullish(),
+        searcheffect: z.string().nullish(),
+      })
+    )
+    .query(async ({ ctx, input }) => {
+      const { limit, cursor, ...filters } = input;
+      
+      const items = await ctx.db.card.findMany({
+        take: limit + 1,
+        cursor: cursor ? { id: cursor } : undefined,
+        where: {
+          // Add filter conditions
+          ...(filters.sets && { set: filters.sets }),
+          ...(filters.attribute && { attribute: filters.attribute }),
+          ...(filters.type && { type: filters.type }),
+          ...(filters.category && { category: filters.category }),
+          ...(filters.color && { color: filters.color }),
+          ...(filters.rarity && { rarity: filters.rarity }),
+          ...(filters.search && {
+            OR: [
+              { name: { contains: filters.search, mode: 'insensitive' } },
+              { card_id: { contains: filters.search, mode: 'insensitive' } },
+            ],
+          }),
+          ...(filters.searcheffect && {
+            effect: { contains: filters.searcheffect, mode: 'insensitive' },
+          }),
         },
-        {
-          Color: {
-            name: "asc" // Then order by color
-          },
+        include: {
+          Category: true,
+          Image: true,
+          Rarity: true,
+          Set: true,
+          Attribute: true,
+          Color: true,
+          Type: true,
         },
-        {
-          is_alt_art: "asc" // Finally order by is_alt_art
+        orderBy: {
+          card_id: 'asc'
         }
-      ]
-    });
-    return cards
-  }),
+      });
+
+      let nextCursor: typeof cursor | undefined = undefined;
+      if (items.length > limit) {
+        const nextItem = items.pop();
+        nextCursor = nextItem?.id;
+      }
+
+      return {
+        items,
+        nextCursor,
+      };
+    }),
 });
