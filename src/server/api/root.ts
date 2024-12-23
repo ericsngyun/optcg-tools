@@ -1,11 +1,11 @@
-import { cardRouter } from "~/server/api/routers/card";
+import { cardRouter } from "~/server/api/routers/card_data/card";
 import { createCallerFactory, createTRPCRouter } from "~/server/api/trpc";
-import { setRouter } from "./routers/set";
-import { categoryRouter } from "./routers/category";
-import { attributeRouter } from "./routers/attribute";
-import { typeRouter } from "./routers/type";
-import { rarityRouter } from "./routers/rarity";
-import { colorRouter } from "./routers/color";
+import { setRouter } from "./routers/card_data/set";
+import { categoryRouter } from "./routers/card_data/category";
+import { attributeRouter } from "./routers/card_data/attribute";
+import { typeRouter } from "./routers/card_data/type";
+import { rarityRouter } from "./routers/card_data/rarity";
+import { colorRouter } from "./routers/card_data/color";
 
 /**
  * This is the primary router for your server.
