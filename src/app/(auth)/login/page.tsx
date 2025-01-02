@@ -13,12 +13,5 @@ const LoginPage = () => {
   )
 }
 
-const LoginForm = () => {
-  return (
-    <Card>
-      
-    </Card>
-  )
-}
 
 export default LoginPage

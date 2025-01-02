@@ -34,6 +34,8 @@ type FilterState = {
   rarity: string | null;
   search: string | null;
   searcheffect: string | null;
+  power: number | null;
+  counter: number | null;
 };
 
 const SELECT_LABELS = [
@@ -66,23 +68,20 @@ export default function Cards() {
     rarity: null,
     search: null,
     searcheffect: null,
+    power: null,
+    counter: null,
   });
 
-  const {
-    data,
-    fetchNextPage,
-    hasNextPage,
-    isFetchingNextPage,
-    isLoading,
-  } = api.card.getCards.useInfiniteQuery(
-    {
-      limit: 32,
-      ...filterState,
-    },
-    {
-      getNextPageParam: (lastPage) => lastPage.nextCursor,
-    }
-  );
+  const { data, fetchNextPage, hasNextPage, isFetchingNextPage, isLoading } =
+    api.card.getCards.useInfiniteQuery(
+      {
+        limit: 48,
+        ...filterState,
+      },
+      {
+        getNextPageParam: (lastPage) => lastPage.nextCursor,
+      },
+    );
 
   // Fetch next page when the last element comes into view
   useEffect(() => {
@@ -92,9 +91,9 @@ export default function Cards() {
   }, [inView, fetchNextPage, hasNextPage, isFetchingNextPage]);
 
   // Flatten the pages array
-  const cards = useMemo(() => 
-    data?.pages.flatMap((page) => page.items) ?? [], 
-    [data?.pages]
+  const cards = useMemo(
+    () => data?.pages.flatMap((page) => page.items) ?? [],
+    [data?.pages],
   );
 
   const { data: sets } = api.set.getSets.useQuery();
@@ -104,12 +103,24 @@ export default function Cards() {
   const { data: color } = api.color.getColors.useQuery();
   const { data: rarity } = api.rarity.getRarity.useQuery();
 
-  const selectGroup = useMemo(() => [
-    sets, attribute, type, category, color, rarity
-  ] as const satisfies readonly ({ id: string; name: string; }[] | undefined)[], [sets, attribute, type, category, color, rarity]);
+  const selectGroup = useMemo(
+    () =>
+      [
+        sets,
+        attribute,
+        type,
+        category,
+        color,
+        rarity,
+      ] as const satisfies readonly (
+        | { id: string; name: string }[]
+        | undefined
+      )[],
+    [sets, attribute, type, category, color, rarity],
+  );
 
   const handleSelectChange = useCallback(
-    (key: keyof Omit<FilterState, 'search'>, value: string) => {
+    (key: keyof Omit<FilterState, "search">, value: string) => {
       setFilterState((prev) => ({
         ...prev,
         [key]: prev[key] === value ? null : value,
@@ -118,26 +129,30 @@ export default function Cards() {
     [],
   );
 
-  const filteredCards = useMemo(() => 
-    cards?.filter(card => {
-      const searchTerm = filterState.search?.toLowerCase();
-      const effectTerm = filterState.searcheffect?.toLowerCase();
-      return (
-        (filterState.sets ? card.set === filterState.sets : true) &&
-        (filterState.attribute ? card.attribute === filterState.attribute : true) &&
-        (filterState.type ? card.type === filterState.type : true) &&
-        (filterState.category ? card.category === filterState.category : true) &&
-        (filterState.color ? card.color === filterState.color : true) &&
-        (filterState.rarity ? card.rarity === filterState.rarity : true) &&
-        (searchTerm ? 
-          (card.name?.toLowerCase().includes(searchTerm) || 
-           card.card_id?.toLowerCase().includes(searchTerm))
-          : true) &&
-        (effectTerm ? 
-          card.effect?.toLowerCase().includes(effectTerm)
-          : true)
-      );
-    }), [cards, filterState]
+  const filteredCards = useMemo(
+    () =>
+      cards?.filter((card) => {
+        const searchTerm = filterState.search?.toLowerCase();
+        const effectTerm = filterState.searcheffect?.toLowerCase();
+        return (
+          (filterState.sets ? card.set === filterState.sets : true) &&
+          (filterState.attribute
+            ? card.attribute === filterState.attribute
+            : true) &&
+          (filterState.type ? card.type === filterState.type : true) &&
+          (filterState.category
+            ? card.category === filterState.category
+            : true) &&
+          (filterState.color ? card.color === filterState.color : true) &&
+          (filterState.rarity ? card.rarity === filterState.rarity : true) &&
+          (searchTerm
+            ? card.name?.toLowerCase().includes(searchTerm) ||
+              card.card_id?.toLowerCase().includes(searchTerm)
+            : true) &&
+          (effectTerm ? card.effect?.toLowerCase().includes(effectTerm) : true)
+        );
+      }),
+    [cards, filterState],
   );
 
   const selectOptions = useMemo(
@@ -146,10 +161,7 @@ export default function Cards() {
         <Select
           key={index}
           onValueChange={(value) =>
-            handleSelectChange(
-              labelToKey[SELECT_LABELS[index]!],
-              value,
-            )
+            handleSelectChange(labelToKey[SELECT_LABELS[index]!], value)
           }
         >
           <SelectTrigger className="w-full">
@@ -174,7 +186,9 @@ export default function Cards() {
   // Add state for input values
   const [nameInput, setNameInput] = useState("");
   const [effectInput, setEffectInput] = useState("");
-  const [selectedValues, setSelectedValues] = useState<Record<string, string>>({});
+  const [selectedValues, setSelectedValues] = useState<Record<string, string>>(
+    {},
+  );
 
   // Update the clear function
   const handleClear = () => {
@@ -187,6 +201,8 @@ export default function Cards() {
       rarity: null,
       search: null,
       searcheffect: null,
+      power: null,
+      counter: null,
     });
     setNameInput("");
     setEffectInput("");
@@ -194,14 +210,14 @@ export default function Cards() {
     toast({
       variant: "destructive",
       title: "Cleared filters",
-    })
+    });
   };
 
   // Update the input handlers to be more responsive
   const handleNameInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const value = e.target.value;
     setNameInput(value);
-    setFilterState(prev => ({
+    setFilterState((prev) => ({
       ...prev,
       search: value,
     }));
@@ -210,14 +226,23 @@ export default function Cards() {
   const handleEffectInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const value = e.target.value;
     setEffectInput(value);
-    setFilterState(prev => ({
+    setFilterState((prev) => ({
       ...prev,
       searcheffect: value,
     }));
   };
 
   return (
-    <div className="mx-auto w-full max-w-screen-2xl space-y-8 px-2.5 py-6 md:px-12 lg:px-20 xl:px-28">
+    <div
+      className="mx-auto w-full max-w-screen-2xl space-y-8 px-2.5 py-6 md:px-12 lg:px-20 xl:px-28"
+      style={{
+        backgroundImage:
+          'url("/Users/ericyun/code-stuff/bustertools/public/background.png")',
+        backgroundSize: 'cover',
+        backgroundPosition: 'center',
+        minHeight: '100vh',
+      }}
+    >
       {/* this is for the filter box */}
       <Card className="">
         <CardHeader>
@@ -243,12 +268,12 @@ export default function Cards() {
               />
             </div>
             <div className="grid grid-cols-3 gap-4">{selectOptions}</div>
-
+            <div className="grid grid-cols-2 gap-4"> </div>
             <Button onClick={handleClear}>
-              Clear<XIcon/>
+              Clear
+              <XIcon />
             </Button>
           </div>
-          
         </CardContent>
       </Card>
       <div className="grid grid-cols-4 gap-3 md:grid-cols-4 lg:grid-cols-6 xl:grid-cols-7">
@@ -261,11 +286,10 @@ export default function Cards() {
             {cards.map((card) => (
               <MyCard key={card.id} card={card} />
             ))}
-            {isFetchingNextPage && (
+            {isFetchingNextPage &&
               Array.from({ length: 24 }).map((_, index) => (
-                <Skeleton key={`loading-${index}`} className="h-[275px]" />
-              ))
-            )}
+                <Skeleton key={`loading-${index}`} className="h-[275px]"/>
+              ))}
             <div ref={ref} className="col-span-full h-1" />
           </>
         )}
