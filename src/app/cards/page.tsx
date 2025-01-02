@@ -38,6 +38,30 @@ type FilterState = {
   counter: number | null;
 };
 
+const POWER_LIST= [
+  0,
+  1000,
+  2000,
+  3000,
+  4000,
+  5000,
+  6000,
+  7000,
+  8000,
+  9000,
+  10000,
+  11000,
+  12000,
+  13000,
+  14000,
+] as const
+
+const COUNTER_LIST = [
+  0,
+  1000,
+  2000,
+]
+
 const SELECT_LABELS = [
   "Set",
   "Attribute",
@@ -58,6 +82,11 @@ const labelToKey = {
 
 export default function Cards() {
   const { ref, inView } = useInView();
+  const [nameInput, setNameInput] = useState("");
+  const [effectInput, setEffectInput] = useState("");
+  const [selectedValues, setSelectedValues] = useState<Record<string, string>>(
+    {},
+  );
 
   const [filterState, setFilterState] = useState<FilterState>({
     sets: null,
@@ -160,7 +189,8 @@ export default function Cards() {
       selectGroup.map((group, index) => (
         <Select
           key={index}
-          onValueChange={(value) =>
+          value={selectedValues[SELECT_LABELS[index]!]}
+          onValueChange={(value) => 
             handleSelectChange(labelToKey[SELECT_LABELS[index]!], value)
           }
         >
@@ -180,15 +210,11 @@ export default function Cards() {
           </SelectContent>
         </Select>
       )),
-    [selectGroup, handleSelectChange],
+    [selectGroup, handleSelectChange, selectedValues],
   );
 
   // Add state for input values
-  const [nameInput, setNameInput] = useState("");
-  const [effectInput, setEffectInput] = useState("");
-  const [selectedValues, setSelectedValues] = useState<Record<string, string>>(
-    {},
-  );
+
 
   // Update the clear function
   const handleClear = () => {
@@ -206,7 +232,14 @@ export default function Cards() {
     });
     setNameInput("");
     setEffectInput("");
-    setSelectedValues({});
+    setSelectedValues({
+      Set: "",
+      Attribute: "",
+      Type: "",
+      Category: "",
+      Color: "",
+      Rarity: "",
+    });
     toast({
       variant: "destructive",
       title: "Cleared filters",
