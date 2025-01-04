@@ -38,7 +38,7 @@ type FilterState = {
   counter: number | null;
 };
 
-const POWER_LIST= [
+const power= [
   0,
   1000,
   2000,
@@ -56,7 +56,7 @@ const POWER_LIST= [
   14000,
 ] as const
 
-const COUNTER_LIST = [
+const counter = [
   0,
   1000,
   2000,
@@ -178,7 +178,9 @@ export default function Cards() {
             ? card.name?.toLowerCase().includes(searchTerm) ||
               card.card_id?.toLowerCase().includes(searchTerm)
             : true) &&
-          (effectTerm ? card.effect?.toLowerCase().includes(effectTerm) : true)
+          (effectTerm ? card.effect?.toLowerCase().includes(effectTerm) : true) &&
+          (filterState.power ? card.power === filterState.power : true) && 
+          (filterState.counter ? card.counter === filterState.counter : true) 
         );
       }),
     [cards, filterState],
@@ -212,6 +214,10 @@ export default function Cards() {
       )),
     [selectGroup, handleSelectChange, selectedValues],
   );
+
+  const powerOptions = useMemo(
+    () => 
+  )
 
   // Add state for input values
 
@@ -301,7 +307,9 @@ export default function Cards() {
               />
             </div>
             <div className="grid grid-cols-3 gap-4">{selectOptions}</div>
-            <div className="grid grid-cols-2 gap-4"> </div>
+            <div className="grid grid-cols-2 gap-4">
+
+            </div>
             <Button onClick={handleClear}>
               Clear
               <XIcon />

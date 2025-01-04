@@ -1,3 +1,4 @@
+'use client'
 import React from 'react'
 import MaxWidthWrapper from './MaxWidthWrapper'
 import {
@@ -12,14 +13,18 @@ import {
 } from "~/components/ui/navigation-menu"
 import { cn } from '~/lib/utils'
 import Link from 'next/link'
-
+import { useSession } from "next-auth/react"
 
 
 
 const NavBar = () => {
+  // const { data: session } = useSession()
+  // if ( !session?.user) {
+  //   console.log('working')
+  // }
   return (
     <MaxWidthWrapper>
-      <div className="sticky top-0 z-50 w-full border-b">
+      <div className="sticky top-0 z-50 w-full border-b flex justify-between">
         <div className="flex h-14 items-center px-4 gap-6">
           <h1 className="text-2xl font-bold">
             <Link href="/">OPTCG Tools</Link>
@@ -57,6 +62,9 @@ const NavBar = () => {
             </NavigationMenu>
           </div>
         </div>
+        <div className="flex place-items-center">
+          
+        </div>
       </div>
     </MaxWidthWrapper>
   )
@@ -87,5 +95,6 @@ const ListItem = React.forwardRef<
   )
 })
 ListItem.displayName = "ListItem"
+
 
 export default NavBar
