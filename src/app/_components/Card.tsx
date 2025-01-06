@@ -93,13 +93,13 @@ const MyCard: React.FC<CardProps> = ({ card }) => {
                   <p>{card.Rarity?.name}</p>
                 </div>
                 <div className="flex flex-col">
-                  <h1 className="font-semibold text-slate-700">Category</h1>
-                  <p>{card.Category?.name}</p>
+                  <h1 className="font-semibold text-slate-700">Type</h1>
+                  <p>{card.Type?.name}</p>
                 </div>
                 {card.Category?.name == "CHARACTER" || card.Category?.name == "EVENT" || card.Category?.name == "STAGE" || card.Category?.name == "Leader" ? 
                   (
                     <div className="flex flex-col">
-                      <h1 className="font-semibold text-slate-700">Type</h1>
+                      <h1 className="font-semibold text-slate-700">Category</h1>
                       <p>{card.Category?.name}</p>
                     </div>
                   )

@@ -24,6 +24,8 @@ import { Button } from "~/components/ui/button";
 import { XIcon } from "lucide-react";
 import { toast } from "~/hooks/use-toast";
 import { useInView } from "react-intersection-observer";
+import { Slider } from "~/components/ui/slider";
+import { filter } from "lodash";
 
 type FilterState = {
   sets: string | null;
@@ -179,8 +181,8 @@ export default function Cards() {
               card.card_id?.toLowerCase().includes(searchTerm)
             : true) &&
           (effectTerm ? card.effect?.toLowerCase().includes(effectTerm) : true) &&
-          (filterState.power ? card.power === filterState.power : true) && 
-          (filterState.counter ? card.counter === filterState.counter : true) 
+          (filterState.power !== null ? card.power === filterState.power : true) &&
+          (filterState.counter !== null ? card.counter === filterState.counter : true)
         );
       }),
     [cards, filterState],
@@ -215,9 +217,7 @@ export default function Cards() {
     [selectGroup, handleSelectChange, selectedValues],
   );
 
-  const powerOptions = useMemo(
-    () => 
-  )
+  
 
   // Add state for input values
 
@@ -308,7 +308,17 @@ export default function Cards() {
             </div>
             <div className="grid grid-cols-3 gap-4">{selectOptions}</div>
             <div className="grid grid-cols-2 gap-4">
-
+              <Slider 
+                value={filterState.power ? [filterState.power] : undefined}
+                max={14000}
+                step={1000}
+                onValueChange={(value) => {
+                  setFilterState(prev => ({
+                    ...prev,
+                    power: value[0] ?? null
+                  }))
+                }}
+              />
             </div>
             <Button onClick={handleClear}>
               Clear
