@@ -38,31 +38,9 @@ type FilterState = {
   searcheffect: string | null;
   power: number | null;
   counter: number | null;
+  cost: number | null;
 };
 
-const power= [
-  0,
-  1000,
-  2000,
-  3000,
-  4000,
-  5000,
-  6000,
-  7000,
-  8000,
-  9000,
-  10000,
-  11000,
-  12000,
-  13000,
-  14000,
-] as const
-
-const counter = [
-  0,
-  1000,
-  2000,
-]
 
 const SELECT_LABELS = [
   "Set",
@@ -101,12 +79,13 @@ export default function Cards() {
     searcheffect: null,
     power: null,
     counter: null,
+    cost: null,
   });
 
   const { data, fetchNextPage, hasNextPage, isFetchingNextPage, isLoading } =
     api.card.getCards.useInfiniteQuery(
       {
-        limit: 48,
+        limit: 36,
         ...filterState,
       },
       {
@@ -235,6 +214,7 @@ export default function Cards() {
       searcheffect: null,
       power: null,
       counter: null,
+      cost: null,
     });
     setNameInput("");
     setEffectInput("");
