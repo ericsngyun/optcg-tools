@@ -251,6 +251,7 @@ export default function Cards() {
     }));
   };
 
+
   return (
     <div
       className="mx-auto w-full max-w-screen-2xl space-y-8 px-2.5 py-6 md:px-12 lg:px-20 xl:px-28"
@@ -288,9 +289,10 @@ export default function Cards() {
             </div>
             <div className="grid grid-cols-3 gap-4">{selectOptions}</div>
             <div className="grid grid-cols-2 gap-4">
+              <h2 className="text-md text-center">Power</h2>
               <Slider 
                 value={filterState.power ? [filterState.power] : undefined}
-                max={14000}
+                max={13000}
                 step={1000}
                 onValueChange={(value) => {
                   setFilterState(prev => ({
@@ -298,6 +300,19 @@ export default function Cards() {
                     power: value[0] ?? null
                   }))
                 }}
+              />
+              <h2 className="text-md text-center">Counter</h2>
+              <Slider 
+                value={filterState.counter ? [filterState.counter] : undefined}
+                max={2000}
+                step={1000}
+                defaultValue={undefined}
+                onValueChange={(value) => {
+                    setFilterState(prev => ({
+                      ...prev,
+                      counter: value[0] ?? null
+                    }))
+                  }}
               />
             </div>
             <Button onClick={handleClear}>
@@ -319,7 +334,7 @@ export default function Cards() {
             ))}
             {isFetchingNextPage &&
               Array.from({ length: 24 }).map((_, index) => (
-                <Skeleton key={`loading-${index}`} className="h-[275px]"/>
+                <Skeleton key={`loading-${index}`} className="h-[275px] rounded-lg"/>
               ))}
             <div ref={ref} className="col-span-full h-1" />
           </>

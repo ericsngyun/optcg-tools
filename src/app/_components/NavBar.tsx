@@ -13,11 +13,11 @@ import {
 } from "~/components/ui/navigation-menu"
 import { cn } from '~/lib/utils'
 import Link from 'next/link'
-import { useSession } from "next-auth/react"
 
 
 
 const NavBar = () => {
+
   // const { data: session } = useSession()
   // if ( !session?.user) {
   //   console.log('working')
