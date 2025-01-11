@@ -32,6 +32,7 @@ type CardProps = {
 };
 
 const MyCard: React.FC<CardProps> = ({ card }) => {
+
   return (
     <Dialog>
       <DialogTrigger>
@@ -50,6 +51,7 @@ const MyCard: React.FC<CardProps> = ({ card }) => {
         <div className="flex gap-4">
           {card.Image?.image_url ? (
             <NextImage
+              
               src={card.Image.image_url}
               alt="card image"
               height={350}

@@ -64,7 +64,7 @@ export default function Cards() {
   const { ref, inView } = useInView();
   const [nameInput, setNameInput] = useState("");
   const [effectInput, setEffectInput] = useState("");
-  const [selectedValues, setSelectedValues] = useState<Record<string, string>>(
+  const [selectedValues, setSelectedValues] = useState<Record<string, string | null>>(
     {},
   );
 
@@ -85,7 +85,7 @@ export default function Cards() {
   const { data, fetchNextPage, hasNextPage, isFetchingNextPage, isLoading } =
     api.card.getCards.useInfiniteQuery(
       {
-        limit: 36,
+        limit: 52,
         ...filterState,
       },
       {
@@ -96,7 +96,7 @@ export default function Cards() {
   // Fetch next page when the last element comes into view
   useEffect(() => {
     if (inView && hasNextPage && !isFetchingNextPage) {
-      void fetchNextPage();
+       void fetchNextPage();
     }
   }, [inView, fetchNextPage, hasNextPage, isFetchingNextPage]);
 
@@ -132,6 +132,11 @@ export default function Cards() {
   const handleSelectChange = useCallback(
     (key: keyof Omit<FilterState, "search">, value: string) => {
       setFilterState((prev) => ({
+        ...prev,
+        [key]: prev[key] === value ? null : value,
+      }));
+      // Update selectedValues state
+      setSelectedValues((prev) => ({
         ...prev,
         [key]: prev[key] === value ? null : value,
       }));
@@ -172,7 +177,7 @@ export default function Cards() {
       selectGroup.map((group, index) => (
         <Select
           key={index}
-          value={selectedValues[SELECT_LABELS[index]!]}
+          value={selectedValues[SELECT_LABELS[index]!] ?? undefined}
           onValueChange={(value) => 
             handleSelectChange(labelToKey[SELECT_LABELS[index]!], value)
           }
@@ -216,21 +221,26 @@ export default function Cards() {
       counter: null,
       cost: null,
     });
+  
     setNameInput("");
     setEffectInput("");
+  
+    // Reset selectedValues to null
     setSelectedValues({
-      Set: "",
-      Attribute: "",
-      Type: "",
-      Category: "",
-      Color: "",
-      Rarity: "",
+      Set: null,
+      Attribute: null,
+      Type: null,
+      Category: null,
+      Color: null,
+      Rarity: null,
     });
+  
     toast({
       variant: "destructive",
       title: "Cleared filters",
     });
   };
+  
 
   // Update the input handlers to be more responsive
   const handleNameInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -324,7 +334,7 @@ export default function Cards() {
       </Card>
       <div className="grid grid-cols-4 gap-3 md:grid-cols-4 lg:grid-cols-6 xl:grid-cols-7">
         {isLoading ? (
-          Array.from({ length: 32 }).map((_, index) => (
+          Array.from({ length: 36 }).map((_, index) => (
             <Skeleton key={index} className="h-[250px]" />
           ))
         ) : (
@@ -333,7 +343,7 @@ export default function Cards() {
               <MyCard key={card.id} card={card} />
             ))}
             {isFetchingNextPage &&
-              Array.from({ length: 24 }).map((_, index) => (
+              Array.from({ length: 36 }).map((_, index) => (
                 <Skeleton key={`loading-${index}`} className="h-[275px] rounded-lg"/>
               ))}
             <div ref={ref} className="col-span-full h-1" />
