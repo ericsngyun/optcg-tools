@@ -41,14 +41,10 @@ model User {
   id            String    @id @default(cuid())
   name          String?
   email         String?   @unique
-  username      String?   @unique
-  password      String?   // hashed password
   emailVerified DateTime?
   image         String?
   accounts      Account[]
   sessions      Session[]
-  created_at    DateTime  @default(now())
-  updated_at    DateTime  @updatedAt
 }
 
 model VerificationToken {
@@ -80,12 +76,12 @@ model Card {
   attribute  String?    @default(dbgenerated("gen_random_uuid()")) @db.Uuid
   image      String?    @default(dbgenerated("gen_random_uuid()")) @db.Uuid
   Attribute  Attribute? @relation(fields: [attribute], references: [id], onDelete: NoAction, onUpdate: NoAction)
-  Category   Category?  @relation(fields: [category], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "cards_category_fkey")
   Color      Color?     @relation(fields: [color], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  Type       Type?      @relation(fields: [type], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  Category   Category?  @relation(fields: [category], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "cards_category_fkey")
   Image      Image?     @relation(fields: [image], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "cards_image_fkey")
   Rarity     Rarity?    @relation(fields: [rarity], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "cards_rarity_fkey")
   Set        Set?       @relation(fields: [set], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "cards_set_fkey")
-  Type       Type?      @relation(fields: [type], references: [id], onDelete: NoAction, onUpdate: NoAction)
 }
 
 /// This model contains row level security and requires additional setup for migrations. Visit https://pris.ly/d/row-level-security for more info.
