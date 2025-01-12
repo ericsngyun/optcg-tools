@@ -2,6 +2,8 @@
 @tailwind components;
 @tailwind utilities;
 
+
+
 @layer base {
   :root {
     --background: 0 0% 100%;
@@ -59,6 +61,13 @@
   }
 }
 
+@font-face {
+  font-family: 'IBM-Medium'; /* Name of the font */
+  src: url('/Users/ericyun/code-stuff/bustertools/public/IBM_Plex_Mono/IBMPlexMono-Medium.ttf') format('truetype'); 
+  font-weight: normal; 
+  font-style: normal;
+}
+
 @layer base {
   * {
     @apply border-border;
@@ -66,10 +75,13 @@
   body {
     @apply bg-background text-foreground;
     background-image: url('/Users/ericyun/code-stuff/bustertools/public/background.png');
-    background-size: cover
+    background-size: cover;
+    font-family: 'IBM-Medium', sans-serif;
   }
 }
+
 
 .hex-badge {
   clip-path: polygon(10% 0, 90% 0, 100% 50%, 90% 100%, 10% 100%, 0 50%)
 }
+
