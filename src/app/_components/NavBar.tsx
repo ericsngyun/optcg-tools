@@ -27,34 +27,34 @@ const NavBar = () => {
       <div className="sticky top-0 z-50 w-full border-b flex justify-between">
         <div className="flex h-14 items-center px-4 gap-6">
           <h1 className="text-2xl font-bold">
-            <Link href="/">OPTCG Tools</Link>
+            <Link href="/">optcgtools</Link>
           </h1>
           <div>
             <NavigationMenu>
               <NavigationMenuList>
                 <NavigationMenuItem>
-                  <NavigationMenuTrigger>Cards</NavigationMenuTrigger>
+                  <NavigationMenuTrigger>cards</NavigationMenuTrigger>
                   <NavigationMenuContent>
                     <ul className="grid gap-3 p-4 md:w-[400px] lg:w-[500px] lg:grid-cols-[.75hfr_1fr]">
-                      <ListItem href="/cards" title="Card List">List of all OPTCG cards</ListItem>
-                      <ListItem href="/price-watch" title="Price Watch">Keep an eye on OPTCG card price trends</ListItem>
+                      <ListItem href="/cards" title="card List">List of all OPTCG cards</ListItem>
+                      <ListItem href="/price-watch" title="price watch">Keep an eye on OPTCG card price trends</ListItem>
                     </ul>
                   </NavigationMenuContent>
                 </NavigationMenuItem>
                 <NavigationMenuItem>
-                  <NavigationMenuTrigger>Decks</NavigationMenuTrigger>
+                  <NavigationMenuTrigger>decks</NavigationMenuTrigger>
                   <NavigationMenuContent>
                     <ul className="grid gap-3 p-4 md:w-[400px] lg:w-[500px] lg:grid-cols-[.75hfr_1fr]">
-                      <ListItem href="/meta-decks" title="Meta Decks">List of all current meta deck profiles</ListItem>
-                      <ListItem href="/deck-lists" title="Deck Lits">List of all public deck lists</ListItem>
+                      <ListItem href="/meta-decks" title="meta decks">List of all current meta deck profiles</ListItem>
+                      <ListItem href="/deck-lists" title="deck lists">List of all public deck lists</ListItem>
                     </ul>
                   </NavigationMenuContent>
                 </NavigationMenuItem>
                 <NavigationMenuItem>
-                  <NavigationMenuTrigger>Tournaments</NavigationMenuTrigger>
+                  <NavigationMenuTrigger>tournaments</NavigationMenuTrigger>
                   <NavigationMenuContent>
                     <ul className="grid gap-3 p-4 md:w-[400px] lg:w-[500px] lg:grid-cols-[.75hfr_1fr]">
-                      <ListItem href="/tournament" title="Tournament Data">List of past tournament results</ListItem>
+                      <ListItem href="/tournament" title="tournament history">List of past tournament results</ListItem>
                     </ul>
                   </NavigationMenuContent>
                 </NavigationMenuItem>

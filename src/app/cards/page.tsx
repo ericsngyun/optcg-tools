@@ -21,7 +21,7 @@ import {
 import { Input } from "~/components/ui/input";
 import { Skeleton } from "~/components/ui/skeleton";
 import { Button } from "~/components/ui/button";
-import { XIcon } from "lucide-react";
+import { Check, ChevronsUpDown, XIcon } from "lucide-react";
 import { toast } from "~/hooks/use-toast";
 import { useInView } from "react-intersection-observer";
 import { Slider } from "~/components/ui/slider";
@@ -38,6 +38,7 @@ import {
   PopoverContent,
   PopoverTrigger,
 } from "~/components/ui/popover"
+import { cn } from "~/lib/utils";
 
 type FilterState = {
   sets: string | null;
@@ -76,6 +77,9 @@ export default function Cards() {
   const { ref, inView } = useInView();
   const [nameInput, setNameInput] = useState("");
   const [effectInput, setEffectInput] = useState("");
+  const [open, setOpen] = useState(false);
+  const [value, setValue] = useState({});
+  
   const [selectedValues, setSelectedValues] = useState<Record<string, string | null>>(
     {},
   );
@@ -213,6 +217,57 @@ export default function Cards() {
     [selectGroup, handleSelectChange, selectedValues],
   );
 
+
+  // const selectOptions2 = useMemo(
+  //   () => 
+  //     selectGroup.map((group, index) => (
+  //         <Popover open={open} onOpenChange={setOpen} key = {index}>
+  //           <PopoverTrigger asChild>
+  //             <Button
+  //               variant="outline"
+  //               role="combobox"
+  //               aria-expanded={open}
+  //               className="w-[200px] justify-between"
+  //             >
+  //               {selectGroup[index]
+  //                 ? selectGroup[index].find((value) => value.value === value)?.label
+  //                 : "Select framework..."}
+  //               <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
+  //             </Button>
+  //           </PopoverTrigger>
+  //           <PopoverContent className="w-[200px] p-0">
+  //             <Command>
+  //               <CommandInput placeholder="Search framework..." />
+  //               <CommandList>
+  //                 <CommandEmpty>No framework found.</CommandEmpty>
+  //                 <CommandGroup>
+  //                   {frameworks.map((framework) => (
+  //                     <CommandItem
+  //                       key={framework.value}
+  //                       value={framework.value}
+  //                       onSelect={(currentValue) => {
+  //                         setValue(currentValue === value ? "" : currentValue)
+  //                         setOpen(false)
+  //                       }}
+  //                     >
+  //                       <Check
+  //                         className={cn(
+  //                           "mr-2 h-4 w-4",
+  //                           value === framework.value ? "opacity-100" : "opacity-0"
+  //                         )}
+  //                       />
+  //                       {framework.label}
+  //                     </CommandItem>
+  //                   ))}
+  //                 </CommandGroup>
+  //               </CommandList>
+  //             </Command>
+  //           </PopoverContent>
+  //       </Popover>
+  //     )),
+  //     [selectGroup, handleSelectChange, selectedValues]
+  // )
+
   
 
   // Add state for input values
@@ -237,15 +292,14 @@ export default function Cards() {
     setNameInput("");
     setEffectInput("");
   
-    // Reset selectedValues to null
-    setSelectedValues({
-      Set: null,
-      Attribute: null,
-      Type: null,
-      Category: null,
-      Color: null,
-      Rarity: null,
-    });
+    // Reset selectedValues for each SELECT_LABEL
+    const resetValues = SELECT_LABELS.reduce((acc, label) => {
+      acc[label] = null;
+      console.log(acc)
+      return acc;
+    }, {} as Record<string, string | null>);
+    
+    setSelectedValues(resetValues);
   
     toast({
       variant: "destructive",
@@ -364,56 +418,4 @@ export default function Cards() {
       </div>
     </div>
   );
-}
-
-
-export function ComboboxDemo() {
-  const [open, setOpen] = React.useState(false)
-  const [value, setValue] = React.useState("")
- 
-  return (
-    <Popover open={open} onOpenChange={setOpen}>
-      <PopoverTrigger asChild>
-        <Button
-          variant="outline"
-          role="combobox"
-          aria-expanded={open}
-          className="w-[200px] justify-between"
-        >
-          {value
-            ? frameworks.find((framework) => framework.value === value)?.label
-            : "Select framework..."}
-          <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
-        </Button>
-      </PopoverTrigger>
-      <PopoverContent className="w-[200px] p-0">
-        <Command>
-          <CommandInput placeholder="Search framework..." />
-          <CommandList>
-            <CommandEmpty>No framework found.</CommandEmpty>
-            <CommandGroup>
-              {frameworks.map((framework) => (
-                <CommandItem
-                  key={framework.value}
-                  value={framework.value}
-                  onSelect={(currentValue) => {
-                    setValue(currentValue === value ? "" : currentValue)
-                    setOpen(false)
-                  }}
-                >
-                  <Check
-                    className={cn(
-                      "mr-2 h-4 w-4",
-                      value === framework.value ? "opacity-100" : "opacity-0"
-                    )}
-                  />
-                  {framework.label}
-                </CommandItem>
-              ))}
-            </CommandGroup>
-          </CommandList>
-        </Command>
-      </PopoverContent>
-    </Popover>
-  )
 }
