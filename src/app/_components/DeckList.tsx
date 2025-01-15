@@ -4,7 +4,7 @@ type DeckListProps = {
   deckCode: string[]
 }
 
-const DeckList = (props: Props) => {
+const DeckList = (props: DeckListProps) => {
   return (
     <div>DeckList</div>
   )
