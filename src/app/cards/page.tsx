@@ -366,30 +366,7 @@ export default function Cards() {
             <div className="grid grid-cols-3 gap-4">{selectOptions}</div>
             <div className="grid grid-cols-2 gap-4">
               <h2 className="text-md text-center">Power</h2>
-              <Slider 
-                value={filterState.power ? [filterState.power] : undefined}
-                max={13000}
-                step={1000}
-                onValueChange={(value) => {
-                  setFilterState(prev => ({
-                    ...prev,
-                    power: value[0] ?? null
-                  }))
-                }}
-              />
-              <h2 className="text-md text-center">Counter</h2>
-              <Slider 
-                value={filterState.counter ? [filterState.counter] : undefined}
-                max={2000}
-                step={1000}
-                defaultValue={undefined}
-                onValueChange={(value) => {
-                    setFilterState(prev => ({
-                      ...prev,
-                      counter: value[0] ?? null
-                    }))
-                  }}
-              />
+              
             </div>
             <Button onClick={handleClear}>
               Clear
