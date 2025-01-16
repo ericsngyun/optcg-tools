@@ -122,7 +122,7 @@ export default function Cards() {
     [data?.pages],
   );
 
-  const { data: sets } = api.set.getSets.useQuery();
+  const { data: set } = api.set.getSets.useQuery();
   const { data: attribute } = api.attribute.getAttributes.useQuery();
   const { data: type } = api.type.getTypes.useQuery();
   const { data: category } = api.category.getCategories.useQuery();
@@ -132,7 +132,7 @@ export default function Cards() {
   const selectGroup = useMemo(
     () =>
       [
-        sets,
+        set,
         attribute,
         type,
         category,
@@ -142,7 +142,7 @@ export default function Cards() {
         | { id: string; name: string }[]
         | undefined
       )[],
-    [sets, attribute, type, category, color, rarity],
+    [set, attribute, type, category, color, rarity],
   );
 
   const handleSelectChange = useCallback(
