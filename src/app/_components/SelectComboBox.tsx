@@ -18,99 +18,87 @@ import {
   PopoverTrigger,
 } from "~/components/ui/popover";
 
-interface ComboBoxProps {
-  selectGroup: {
-    id: string;
-    label: string;
-    items: { value: string; label: string }[];
-  }[];
-  onSelect: (id: string, value: string) => void;
-  selectedValues: Record<string, string>;
+type SelectOption = {
+  id: string;
+  name: string;
 }
 
-export function ComboBox({
-  selectGroup,
-  onSelect,
-  selectedValues,
-}: ComboBoxProps) {
-  const [openStates, setOpenStates] = React.useState<Record<string, boolean>>(
-    Object.fromEntries(selectGroup.map((group) => [group.id, false]))
-  );
+interface SelectGroupProps {
+  selectGroup: SelectOption[];
+  index: number;
+  open: boolean;
+}
 
-  const handleOpenChange = (id: string, open: boolean) => {
-    setOpenStates((prev) => ({
-      ...prev,
-      [id]: open,
-    }));
-  };
+const frameworks = [
+  {
+    value: "next.js",
+    label: "Next.js",
+  },
+  {
+    value: "sveltekit",
+    label: "SvelteKit",
+  },
+  {
+    value: "nuxt.js",
+    label: "Nuxt.js",
+  },
+  {
+    value: "remix",
+    label: "Remix",
+  },
+  {
+    value: "astro",
+    label: "Astro",
+  },
+]
 
-  const handleSelect = (id: string, value: string) => {
-    onSelect(id, value);
-    setOpenStates((prev) => ({
-      ...prev,
-      [id]: false,
-    }));
-  };
+export function ComboboxDemo() {
+  const [open, setOpen] = React.useState(false)
+  const [value, setValue] = React.useState("")
 
   return (
-    <div className="space-y-4">
-      {selectGroup.map((category) => (
-        <Popover
-          key={category.id}
-          open={openStates[category.id]}
-          onOpenChange={(open) => handleOpenChange(category.id, open)}
+    <Popover open={open} onOpenChange={setOpen}>
+      <PopoverTrigger asChild>
+        <Button
+          variant="outline"
+          role="combobox"
+          aria-expanded={open}
+          className="w-[200px] justify-between"
         >
-          <PopoverTrigger asChild>
-            <Button
-              variant="outline"
-              role="combobox"
-              aria-expanded={openStates[category.id]}
-              className="w-[200px] justify-between"
-            >
-              {selectedValues[category.id]
-                ? category.items.find(
-                    (item) => item.value === selectedValues[category.id]
-                  )?.label
-                : `Select ${category.label.toLowerCase()}...`}
-              <ChevronsUpDown className="opacity-50" />
-            </Button>
-          </PopoverTrigger>
-          <PopoverContent className="w-[200px] p-0">
-            <Command>
-              <CommandInput
-                placeholder={`Search ${category.label.toLowerCase()}...`}
-              />
-              <CommandList>
-                <CommandEmpty>No {category.label.toLowerCase()} found.</CommandEmpty>
-                <CommandGroup>
-                  {category.items.map((item) => (
-                    <CommandItem
-                      key={item.value}
-                      value={item.value}
-                      onSelect={() =>
-                        handleSelect(
-                          category.id,
-                          item.value === selectedValues[category.id] ? "" : item.value
-                        )
-                      }
-                    >
-                      {item.label}
-                      <Check
-                        className={cn(
-                          "ml-auto",
-                          selectedValues[category.id] === item.value
-                            ? "opacity-100"
-                            : "opacity-0"
-                        )}
-                      />
-                    </CommandItem>
-                  ))}
-                </CommandGroup>
-              </CommandList>
-            </Command>
-          </PopoverContent>
-        </Popover>
-      ))}
-    </div>
-  );
+          {value
+            ? frameworks.find((framework) => framework.value === value)?.label
+            : "Select framework..."}
+          <ChevronsUpDown className="opacity-50" />
+        </Button>
+      </PopoverTrigger>
+      <PopoverContent className="w-[200px] p-0">
+        <Command>
+          <CommandInput placeholder="Search framework..." />
+          <CommandList>
+            <CommandEmpty>No framework found.</CommandEmpty>
+            <CommandGroup>
+              {frameworks.map((framework) => (
+                <CommandItem
+                  key={framework.value}
+                  value={framework.value}
+                  onSelect={(currentValue) => {
+                    setValue(currentValue === value ? "" : currentValue)
+                    setOpen(false)
+                  }}
+                >
+                  {framework.label}
+                  <Check
+                    className={cn(
+                      "ml-auto",
+                      value === framework.value ? "opacity-100" : "opacity-0"
+                    )}
+                  />
+                </CommandItem>
+              ))}
+            </CommandGroup>
+          </CommandList>
+        </Command>
+      </PopoverContent>
+    </Popover>
+  )
 }

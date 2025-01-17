@@ -39,9 +39,10 @@ import {
   PopoverTrigger,
 } from "~/components/ui/popover"
 import { cn } from "~/lib/utils";
+import { ComboBox } from "../_components/SelectComboBox";
 
 type FilterState = {
-  sets: string | null;
+  set: string | null;
   attribute: string | null;
   type: string | null;
   category: string | null;
@@ -65,7 +66,7 @@ const SELECT_LABELS = [
 ] as const;
 
 const labelToKey = {
-  Set: "sets",
+  Set: "set",
   Attribute: "attribute",
   Type: "type",
   Category: "category",
@@ -85,7 +86,7 @@ export default function Cards() {
   );
 
   const [filterState, setFilterState] = useState<FilterState>({
-    sets: null,
+    set: null,
     attribute: null,
     type: null,
     category: null,
@@ -145,16 +146,19 @@ export default function Cards() {
     [set, attribute, type, category, color, rarity],
   );
 
+
   const handleSelectChange = useCallback(
     (key: keyof Omit<FilterState, "search">, value: string) => {
+      // Update filter state
       setFilterState((prev) => ({
         ...prev,
-        [key]: prev[key] === value ? null : value,
+        [key]: prev[key] === value ? null : value, // Toggle the value or null
       }));
-      // Update selectedValues state
+  
+      // Update selected values state to reflect changes in the selection
       setSelectedValues((prev) => ({
         ...prev,
-        [key]: prev[key] === value ? null : value,
+        [key]: prev[key] === value ? null : value, // Same toggle logic for selected values
       }));
     },
     [],
@@ -166,7 +170,7 @@ export default function Cards() {
         const searchTerm = filterState.search?.toLowerCase();
         const effectTerm = filterState.searcheffect?.toLowerCase();
         return (
-          (filterState.sets ? card.set === filterState.sets : true) &&
+          (filterState.set ? card.set === filterState.set : true) &&
           (filterState.attribute
             ? card.attribute === filterState.attribute
             : true) &&
@@ -218,55 +222,20 @@ export default function Cards() {
   );
 
 
-  // const selectOptions2 = useMemo(
-  //   () => 
-  //     selectGroup.map((group, index) => (
-  //         <Popover open={open} onOpenChange={setOpen} key = {index}>
-  //           <PopoverTrigger asChild>
-  //             <Button
-  //               variant="outline"
-  //               role="combobox"
-  //               aria-expanded={open}
-  //               className="w-[200px] justify-between"
-  //             >
-  //               {selectGroup[index]
-  //                 ? selectGroup[index].find((value) => value.value === value)?.label
-  //                 : "Select framework..."}
-  //               <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
-  //             </Button>
-  //           </PopoverTrigger>
-  //           <PopoverContent className="w-[200px] p-0">
-  //             <Command>
-  //               <CommandInput placeholder="Search framework..." />
-  //               <CommandList>
-  //                 <CommandEmpty>No framework found.</CommandEmpty>
-  //                 <CommandGroup>
-  //                   {frameworks.map((framework) => (
-  //                     <CommandItem
-  //                       key={framework.value}
-  //                       value={framework.value}
-  //                       onSelect={(currentValue) => {
-  //                         setValue(currentValue === value ? "" : currentValue)
-  //                         setOpen(false)
-  //                       }}
-  //                     >
-  //                       <Check
-  //                         className={cn(
-  //                           "mr-2 h-4 w-4",
-  //                           value === framework.value ? "opacity-100" : "opacity-0"
-  //                         )}
-  //                       />
-  //                       {framework.label}
-  //                     </CommandItem>
-  //                   ))}
-  //                 </CommandGroup>
-  //               </CommandList>
-  //             </Command>
-  //           </PopoverContent>
-  //       </Popover>
-  //     )),
-  //     [selectGroup, handleSelectChange, selectedValues]
-  // )
+  // const selectOptions = useMemo(
+  //   () =>
+  //     selectGroup.map((group, index) => ({
+  //       id: index.toString(),
+  //       label: SELECT_LABELS[index],
+  //       items: Array.isArray(group)
+  //         ? group.map((value) => ({
+  //             value: value.id,
+  //             label: value.name,
+  //           }))
+  //         : [],
+  //     })),
+  //   [selectGroup]
+  // );
 
   
 
@@ -276,7 +245,7 @@ export default function Cards() {
   // Update the clear function
   const handleClear = () => {
     setFilterState({
-      sets: null,
+      set: null,
       attribute: null,
       type: null,
       category: null,
@@ -363,7 +332,9 @@ export default function Cards() {
                 placeholder="Effect"
               />
             </div>
-            <div className="grid grid-cols-3 gap-4">{selectOptions}</div>
+            <div className="grid grid-cols-3 gap-4">
+              {selectOptions}
+            </div>
             <div className="grid grid-cols-2 gap-4">
               <h2 className="text-md text-center">Power</h2>
               

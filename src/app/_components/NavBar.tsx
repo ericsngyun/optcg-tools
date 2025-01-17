@@ -30,7 +30,7 @@ const NavBar = () => {
             <Link href="/">optcgtools</Link>
           </h1>
           <div>
-            <NavigationMenu>
+            <NavigationMenu className="">
               <NavigationMenuList>
                 <NavigationMenuItem>
                   <NavigationMenuTrigger>cards</NavigationMenuTrigger>
