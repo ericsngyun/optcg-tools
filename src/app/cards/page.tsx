@@ -21,25 +21,10 @@ import {
 import { Input } from "~/components/ui/input";
 import { Skeleton } from "~/components/ui/skeleton";
 import { Button } from "~/components/ui/button";
-import { Check, ChevronsUpDown, XIcon } from "lucide-react";
+import { XIcon } from "lucide-react";
 import { toast } from "~/hooks/use-toast";
 import { useInView } from "react-intersection-observer";
-import { Slider } from "~/components/ui/slider";
-import {
-  Command,
-  CommandEmpty,
-  CommandGroup,
-  CommandInput,
-  CommandItem,
-  CommandList,
-} from "~/components/ui/command"
-import {
-  Popover,
-  PopoverContent,
-  PopoverTrigger,
-} from "~/components/ui/popover"
-import { cn } from "~/lib/utils";
-import { ComboBox } from "../_components/SelectComboBox";
+
 
 type FilterState = {
   set: string | null;
@@ -78,9 +63,6 @@ export default function Cards() {
   const { ref, inView } = useInView();
   const [nameInput, setNameInput] = useState("");
   const [effectInput, setEffectInput] = useState("");
-  const [open, setOpen] = useState(false);
-  const [value, setValue] = useState({});
-  
   const [selectedValues, setSelectedValues] = useState<Record<string, string | null>>(
     {},
   );
@@ -149,16 +131,19 @@ export default function Cards() {
 
   const handleSelectChange = useCallback(
     (key: keyof Omit<FilterState, "search">, value: string) => {
-      // Update filter state
-      setFilterState((prev) => ({
-        ...prev,
-        [key]: prev[key] === value ? null : value, // Toggle the value or null
-      }));
+      // Update filter state only if the value changes
+      setFilterState((prev) => {
+        const newValue = prev[key] === value ? null : value;
+        return {
+          ...prev,
+          [key]: newValue,
+        };
+      });
   
       // Update selected values state to reflect changes in the selection
       setSelectedValues((prev) => ({
         ...prev,
-        [key]: prev[key] === value ? null : value, // Same toggle logic for selected values
+        [key]: prev[key] === value ? null : value,
       }));
     },
     [],
@@ -196,11 +181,9 @@ export default function Cards() {
     () =>
       selectGroup.map((group, index) => (
         <Select
-          key={index}
+          key={index} // Use a unique key based on the label
           value={selectedValues[SELECT_LABELS[index]!] ?? undefined}
-          onValueChange={(value) => 
-            handleSelectChange(labelToKey[SELECT_LABELS[index]!], value)
-          }
+          onValueChange={(value) => handleSelectChange(labelToKey[SELECT_LABELS[index]!], value)}
         >
           <SelectTrigger className="w-full">
             <SelectValue placeholder={`Select ${SELECT_LABELS[index]}`} />
@@ -220,26 +203,6 @@ export default function Cards() {
       )),
     [selectGroup, handleSelectChange, selectedValues],
   );
-
-
-  // const selectOptions = useMemo(
-  //   () =>
-  //     selectGroup.map((group, index) => ({
-  //       id: index.toString(),
-  //       label: SELECT_LABELS[index],
-  //       items: Array.isArray(group)
-  //         ? group.map((value) => ({
-  //             value: value.id,
-  //             label: value.name,
-  //           }))
-  //         : [],
-  //     })),
-  //   [selectGroup]
-  // );
-
-  
-
-  // Add state for input values
 
 
   // Update the clear function
@@ -300,13 +263,6 @@ export default function Cards() {
   return (
     <div
       className="mx-auto w-full max-w-screen-2xl space-y-8 px-2.5 py-6 md:px-12 lg:px-20 xl:px-28"
-      style={{
-        backgroundImage:
-          'url("/Users/ericyun/code-stuff/bustertools/public/background.png")',
-        backgroundSize: 'cover',
-        backgroundPosition: 'center',
-        minHeight: '100vh',
-      }}
     >
       {/* this is for the filter box */}
       <Card className="">
@@ -353,7 +309,7 @@ export default function Cards() {
           ))
         ) : (
           <>
-            {cards.map((card) => (
+            {filteredCards.map((card) => (
               <MyCard key={card.id} card={card} />
             ))}
             {isFetchingNextPage &&
