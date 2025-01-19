@@ -65,7 +65,9 @@ export default function Cards() {
 
   const [nameInput, setNameInput] = useState("");
   const [effectInput, setEffectInput] = useState("");
-  const [selectedValues, setSelectedValues] = useState<Record<string, string | null>>({});
+  const [selectedValues, setSelectedValues] = useState<
+    Record<string, string | null>
+  >({});
   const [filterState, setFilterState] = useState<FilterState>({
     set: null,
     attribute: null,
@@ -73,17 +75,19 @@ export default function Cards() {
     category: null,
     color: null,
     rarity: null,
-    search: null,
-    searcheffect: null,
+    search: "",
+    searcheffect: "",
     power: null,
     counter: null,
     cost: null,
   });
 
-  const { data, fetchNextPage, hasNextPage, isFetchingNextPage, isLoading } =
+
+  const { data, fetchNextPage, hasNextPage, isFetchingNextPage, isLoading, refetch } =
     api.card.getCards.useInfiniteQuery(
       {
         limit: 52,
+        filters: filterState,
       },
       {
         getNextPageParam: (lastPage) => lastPage.nextCursor,
@@ -98,20 +102,60 @@ export default function Cards() {
   const { data: color } = api.color.getColors.useQuery();
   const { data: rarity } = api.rarity.getRarity.useQuery();
 
+  const filteredCards = useMemo(
+    () => data?.pages.flatMap((page) => page.items) ?? [],
+    [data?.pages],
+  );
+
+  // const filteredCards = useMemo(() => {
+  //   if (!cards) return [];
+
+  //   const searchTerm = filterState.search?.toLowerCase() ?? "";
+  //   const effectTerm = filterState.searcheffect?.toLowerCase() ?? "";
+
+  //   return cards.filter((card) => {
+  //     // Breaking down conditions for better readability and potential optimization
+  //     if (filterState.set && card.set !== filterState.set) return false;
+  //     if (filterState.attribute && card.attribute !== filterState.attribute)
+  //       return false;
+  //     if (filterState.type && card.type !== filterState.type) return false;
+  //     if (filterState.category && card.category !== filterState.category)
+  //       return false;
+  //     if (filterState.color && card.color !== filterState.color) return false;
+  //     if (filterState.rarity && card.rarity !== filterState.rarity)
+  //       return false;
+
+  //     // Search terms
+  //     const nameMatches =
+  //       !searchTerm ||
+  //       card.name?.toLowerCase().includes(searchTerm) ||
+  //       card.card_id?.toLowerCase().includes(searchTerm);
+  //     if (!nameMatches) return false;
+
+  //     const effectMatches =
+  //       !effectTerm || card.effect?.toLowerCase().includes(effectTerm);
+  //     if (!effectMatches) return false;
+
+  //     // Numeric filters
+  //     if (filterState.power !== null && card.power !== filterState.power)
+  //       return false;
+  //     if (filterState.counter !== null && card.counter !== filterState.counter)
+  //       return false;
+
+  //     return true;
+  //   });
+  // }, [cards, filterState]);
+
+
   useEffect(() => {
     if (inView && hasNextPage && !isFetchingNextPage) {
       void fetchNextPage();
     }
   }, [inView, fetchNextPage, hasNextPage, isFetchingNextPage]);
 
-  const cards = useMemo(
-    () => data?.pages.flatMap((page) => page.items) ?? [],
-    [data?.pages]
-  );
-
   const selectGroup = useMemo(
     () => [set, attribute, type, category, color, rarity] as const,
-    [set, attribute, type, category, color, rarity]
+    [set, attribute, type, category, color, rarity],
   );
 
   const handleSelectChange = useCallback(
@@ -126,56 +170,63 @@ export default function Cards() {
         [key]: prev[key] === value ? null : value,
       }));
     },
-    []
+    [],
   );
-  const selectOptions = useMemo(() => 
-    selectGroup.map((group, index) => {
-      const label = SELECT_LABELS[index]!;
-      const key = labelToKey[label];
-      
-      return (
-        <Select
-          key={index}
-          value={selectedValues[key] ?? undefined}
-          onValueChange={(value) => handleSelectChange(key, value)}
-        >
-          <SelectTrigger className="w-full">
-            <SelectValue placeholder={`Select ${label}`} />
-          </SelectTrigger>
-          <SelectContent>
-            <SelectGroup>
-              <SelectLabel>{label}</SelectLabel>
-              {Array.isArray(group) &&
-                group.map((value) => (
-                  <SelectItem key={value.id} value={value.id}>
-                    {value.name}
-                  </SelectItem>
-                ))}
-            </SelectGroup>
-          </SelectContent>
-        </Select>
-      );
-    }),
-    [selectGroup, handleSelectChange, selectedValues]
+  const selectOptions = useMemo(
+    () =>
+      selectGroup.map((group, index) => {
+        const label = SELECT_LABELS[index]!;
+        const key = labelToKey[label];
+
+        return (
+          <Select
+            key={index}
+            value={selectedValues[key] ?? undefined}
+            onValueChange={(value) => handleSelectChange(key, value)}
+          >
+            <SelectTrigger className="w-full">
+              <SelectValue placeholder={`Select ${label}`} />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectGroup>
+                <SelectLabel>{label}</SelectLabel>
+                {Array.isArray(group) &&
+                  group.map((value) => (
+                    <SelectItem key={value.id} value={value.id}>
+                      {value.name}
+                    </SelectItem>
+                  ))}
+              </SelectGroup>
+            </SelectContent>
+          </Select>
+        );
+      }),
+    [selectGroup, handleSelectChange, selectedValues],
   );
 
-  const handleNameInputChange = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
-    const value = e.target.value;
-    setNameInput(value);
-    setFilterState((prev) => ({
-      ...prev,
-      search: value,
-    }));
-  }, []);
+  const handleNameInputChange = useCallback(
+    (e: React.ChangeEvent<HTMLInputElement>) => {
+      const value = e.target.value;
+      setNameInput(value);
+      setFilterState((prev) => ({
+        ...prev,
+        search: value,
+      }));
+    },
+    [],
+  );
 
-  const handleEffectInputChange = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
-    const value = e.target.value;
-    setEffectInput(value);
-    setFilterState((prev) => ({
-      ...prev,
-      searcheffect: value,
-    }));
-  }, []);
+  const handleEffectInputChange = useCallback(
+    (e: React.ChangeEvent<HTMLInputElement>) => {
+      const value = e.target.value;
+      setEffectInput(value);
+      setFilterState((prev) => ({
+        ...prev,
+        searcheffect: value,
+      }));
+    },
+    [],
+  );
 
   const handleClear = useCallback(() => {
     setFilterState({
@@ -185,8 +236,8 @@ export default function Cards() {
       category: null,
       color: null,
       rarity: null,
-      search: null,
-      searcheffect: null,
+      search: '',
+      searcheffect: '',
       power: null,
       counter: null,
       cost: null,
@@ -194,45 +245,12 @@ export default function Cards() {
     setNameInput("");
     setEffectInput("");
     setSelectedValues({});
-    
+
     toast({
       variant: "destructive",
       title: "Cleared filters",
     });
   }, []);
-
-  const filteredCards = useMemo(() => {
-    if (!cards) return [];
-  
-    const searchTerm = filterState.search?.toLowerCase() ?? '';
-    const effectTerm = filterState.searcheffect?.toLowerCase() ?? '';
-  
-    return cards.filter((card) => {
-      // Breaking down conditions for better readability and potential optimization
-      if (filterState.set && card.set !== filterState.set) return false;
-      if (filterState.attribute && card.attribute !== filterState.attribute) return false;
-      if (filterState.type && card.type !== filterState.type) return false;
-      if (filterState.category && card.category !== filterState.category) return false;
-      if (filterState.color && card.color !== filterState.color) return false;
-      if (filterState.rarity && card.rarity !== filterState.rarity) return false;
-      
-      // Search terms
-      const nameMatches = !searchTerm || 
-        card.name?.toLowerCase().includes(searchTerm) || 
-        card.card_id?.toLowerCase().includes(searchTerm);
-      if (!nameMatches) return false;
-      
-      const effectMatches = !effectTerm || 
-        card.effect?.toLowerCase().includes(effectTerm);
-      if (!effectMatches) return false;
-      
-      // Numeric filters
-      if (filterState.power !== null && card.power !== filterState.power) return false;
-      if (filterState.counter !== null && card.counter !== filterState.counter) return false;
-      
-      return true;
-    });
-  }, [cards, filterState]);
 
   // Update the renderCards function to use filteredCards
   const renderCards = useCallback(() => {
@@ -260,9 +278,7 @@ export default function Cards() {
       <Card>
         <CardHeader>
           <CardTitle>Card List</CardTitle>
-          <CardDescription>
-            Total Results: {cards.length}
-          </CardDescription>
+          <CardDescription>Total Results: {filteredCards.length}</CardDescription>
         </CardHeader>
         <CardContent>
           <div className="space-y-4">
@@ -280,9 +296,7 @@ export default function Cards() {
                 placeholder="Effect"
               />
             </div>
-            <div className="grid grid-cols-3 gap-4">
-              {selectOptions}
-            </div>
+            <div className="grid grid-cols-3 gap-4">{selectOptions}</div>
             <div className="grid grid-cols-2 gap-4">
               <h2 className="text-md text-center">Power</h2>
             </div>
@@ -293,7 +307,7 @@ export default function Cards() {
           </div>
         </CardContent>
       </Card>
-      
+
       <div className="grid grid-cols-4 gap-3 md:grid-cols-4 lg:grid-cols-6 xl:grid-cols-7">
         {renderCards()}
         <div ref={ref} className="col-span-full h-1" />
