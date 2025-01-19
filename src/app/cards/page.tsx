@@ -25,7 +25,6 @@ import { XIcon } from "lucide-react";
 import { toast } from "~/hooks/use-toast";
 import { useInView } from "react-intersection-observer";
 
-
 type FilterState = {
   set: string | null;
   attribute: string | null;
@@ -39,7 +38,6 @@ type FilterState = {
   counter: number | null;
   cost: number | null;
 };
-
 
 const SELECT_LABELS = [
   "Set",
@@ -60,13 +58,14 @@ const labelToKey = {
 } as const;
 
 export default function Cards() {
-  const { ref, inView } = useInView();
+  const { ref, inView } = useInView({
+    threshold: 0,
+    rootMargin: "400px",
+  });
+
   const [nameInput, setNameInput] = useState("");
   const [effectInput, setEffectInput] = useState("");
-  const [selectedValues, setSelectedValues] = useState<Record<string, string | null>>(
-    {},
-  );
-
+  const [selectedValues, setSelectedValues] = useState<Record<string, string | null>>({});
   const [filterState, setFilterState] = useState<FilterState>({
     set: null,
     attribute: null,
@@ -85,26 +84,13 @@ export default function Cards() {
     api.card.getCards.useInfiniteQuery(
       {
         limit: 52,
-        ...filterState,
       },
       {
         getNextPageParam: (lastPage) => lastPage.nextCursor,
       },
     );
 
-  // Fetch next page when the last element comes into view
-  useEffect(() => {
-    if (inView && hasNextPage && !isFetchingNextPage) {
-       void fetchNextPage();
-    }
-  }, [inView, fetchNextPage, hasNextPage, isFetchingNextPage]);
-
-  // Flatten the pages array
-  const cards = useMemo(
-    () => data?.pages.flatMap((page) => page.items) ?? [],
-    [data?.pages],
-  );
-
+  // Static data queries
   const { data: set } = api.set.getSets.useQuery();
   const { data: attribute } = api.attribute.getAttributes.useQuery();
   const { data: type } = api.type.getTypes.useQuery();
@@ -112,85 +98,53 @@ export default function Cards() {
   const { data: color } = api.color.getColors.useQuery();
   const { data: rarity } = api.rarity.getRarity.useQuery();
 
-  const selectGroup = useMemo(
-    () =>
-      [
-        set,
-        attribute,
-        type,
-        category,
-        color,
-        rarity,
-      ] as const satisfies readonly (
-        | { id: string; name: string }[]
-        | undefined
-      )[],
-    [set, attribute, type, category, color, rarity],
+  useEffect(() => {
+    if (inView && hasNextPage && !isFetchingNextPage) {
+      void fetchNextPage();
+    }
+  }, [inView, fetchNextPage, hasNextPage, isFetchingNextPage]);
+
+  const cards = useMemo(
+    () => data?.pages.flatMap((page) => page.items) ?? [],
+    [data?.pages]
   );
 
+  const selectGroup = useMemo(
+    () => [set, attribute, type, category, color, rarity] as const,
+    [set, attribute, type, category, color, rarity]
+  );
 
   const handleSelectChange = useCallback(
     (key: keyof Omit<FilterState, "search">, value: string) => {
-      // Update filter state only if the value changes
-      setFilterState((prev) => {
-        const newValue = prev[key] === value ? null : value;
-        return {
-          ...prev,
-          [key]: newValue,
-        };
-      });
-  
-      // Update selected values state to reflect changes in the selection
+      setFilterState((prev) => ({
+        ...prev,
+        [key]: prev[key] === value ? null : value,
+      }));
+
       setSelectedValues((prev) => ({
         ...prev,
         [key]: prev[key] === value ? null : value,
       }));
     },
-    [],
+    []
   );
-
-  const filteredCards = useMemo(
-    () =>
-      cards?.filter((card) => {
-        const searchTerm = filterState.search?.toLowerCase();
-        const effectTerm = filterState.searcheffect?.toLowerCase();
-        return (
-          (filterState.set ? card.set === filterState.set : true) &&
-          (filterState.attribute
-            ? card.attribute === filterState.attribute
-            : true) &&
-          (filterState.type ? card.type === filterState.type : true) &&
-          (filterState.category
-            ? card.category === filterState.category
-            : true) &&
-          (filterState.color ? card.color === filterState.color : true) &&
-          (filterState.rarity ? card.rarity === filterState.rarity : true) &&
-          (searchTerm
-            ? card.name?.toLowerCase().includes(searchTerm) ||
-              card.card_id?.toLowerCase().includes(searchTerm)
-            : true) &&
-          (effectTerm ? card.effect?.toLowerCase().includes(effectTerm) : true) &&
-          (filterState.power !== null ? card.power === filterState.power : true) &&
-          (filterState.counter !== null ? card.counter === filterState.counter : true)
-        );
-      }),
-    [cards, filterState],
-  );
-
-  const selectOptions = useMemo(
-    () =>
-      selectGroup.map((group, index) => (
+  const selectOptions = useMemo(() => 
+    selectGroup.map((group, index) => {
+      const label = SELECT_LABELS[index]!;
+      const key = labelToKey[label];
+      
+      return (
         <Select
-          key={index} // Use a unique key based on the label
-          value={selectedValues[SELECT_LABELS[index]!] ?? undefined}
-          onValueChange={(value) => handleSelectChange(labelToKey[SELECT_LABELS[index]!], value)}
+          key={index}
+          value={selectedValues[key] ?? undefined}
+          onValueChange={(value) => handleSelectChange(key, value)}
         >
           <SelectTrigger className="w-full">
-            <SelectValue placeholder={`Select ${SELECT_LABELS[index]}`} />
+            <SelectValue placeholder={`Select ${label}`} />
           </SelectTrigger>
           <SelectContent>
             <SelectGroup>
-              <SelectLabel>{SELECT_LABELS[index]}</SelectLabel>
+              <SelectLabel>{label}</SelectLabel>
               {Array.isArray(group) &&
                 group.map((value) => (
                   <SelectItem key={value.id} value={value.id}>
@@ -200,13 +154,30 @@ export default function Cards() {
             </SelectGroup>
           </SelectContent>
         </Select>
-      )),
-    [selectGroup, handleSelectChange, selectedValues],
+      );
+    }),
+    [selectGroup, handleSelectChange, selectedValues]
   );
 
+  const handleNameInputChange = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
+    const value = e.target.value;
+    setNameInput(value);
+    setFilterState((prev) => ({
+      ...prev,
+      search: value,
+    }));
+  }, []);
 
-  // Update the clear function
-  const handleClear = () => {
+  const handleEffectInputChange = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
+    const value = e.target.value;
+    setEffectInput(value);
+    setFilterState((prev) => ({
+      ...prev,
+      searcheffect: value,
+    }));
+  }, []);
+
+  const handleClear = useCallback(() => {
     setFilterState({
       set: null,
       attribute: null,
@@ -220,56 +191,77 @@ export default function Cards() {
       counter: null,
       cost: null,
     });
-  
     setNameInput("");
     setEffectInput("");
-  
-    // Reset selectedValues for each SELECT_LABEL
-    const resetValues = SELECT_LABELS.reduce((acc, label) => {
-      acc[label] = null;
-      console.log(acc)
-      return acc;
-    }, {} as Record<string, string | null>);
+    setSelectedValues({});
     
-    setSelectedValues(resetValues);
-  
     toast({
       variant: "destructive",
       title: "Cleared filters",
     });
-  };
+  }, []);
+
+  const filteredCards = useMemo(() => {
+    if (!cards) return [];
   
+    const searchTerm = filterState.search?.toLowerCase() ?? '';
+    const effectTerm = filterState.searcheffect?.toLowerCase() ?? '';
+  
+    return cards.filter((card) => {
+      // Breaking down conditions for better readability and potential optimization
+      if (filterState.set && card.set !== filterState.set) return false;
+      if (filterState.attribute && card.attribute !== filterState.attribute) return false;
+      if (filterState.type && card.type !== filterState.type) return false;
+      if (filterState.category && card.category !== filterState.category) return false;
+      if (filterState.color && card.color !== filterState.color) return false;
+      if (filterState.rarity && card.rarity !== filterState.rarity) return false;
+      
+      // Search terms
+      const nameMatches = !searchTerm || 
+        card.name?.toLowerCase().includes(searchTerm) || 
+        card.card_id?.toLowerCase().includes(searchTerm);
+      if (!nameMatches) return false;
+      
+      const effectMatches = !effectTerm || 
+        card.effect?.toLowerCase().includes(effectTerm);
+      if (!effectMatches) return false;
+      
+      // Numeric filters
+      if (filterState.power !== null && card.power !== filterState.power) return false;
+      if (filterState.counter !== null && card.counter !== filterState.counter) return false;
+      
+      return true;
+    });
+  }, [cards, filterState]);
 
-  // Update the input handlers to be more responsive
-  const handleNameInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const value = e.target.value;
-    setNameInput(value);
-    setFilterState((prev) => ({
-      ...prev,
-      search: value,
-    }));
-  };
+  // Update the renderCards function to use filteredCards
+  const renderCards = useCallback(() => {
+    if (isLoading) {
+      return Array.from({ length: 52 }).map((_, index) => (
+        <Skeleton key={`skeleton-${index}`} className="h-[250px]" />
+      ));
+    }
 
-  const handleEffectInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const value = e.target.value;
-    setEffectInput(value);
-    setFilterState((prev) => ({
-      ...prev,
-      searcheffect: value,
-    }));
-  };
-
+    return (
+      <>
+        {filteredCards.map((card) => (
+          <MyCard key={card.Image?.image_url} card={card} />
+        ))}
+        {isFetchingNextPage &&
+          Array.from({ length: 52 }).map((_, index) => (
+            <Skeleton key={`loading-${index}`} className="h-[275px] rounded-lg" />
+          ))}
+      </>
+    );
+  }, [filteredCards, isLoading, isFetchingNextPage]);
 
   return (
-    <div
-      className="mx-auto w-full max-w-screen-2xl space-y-8 px-2.5 py-6 md:px-12 lg:px-20 xl:px-28"
-    >
-      {/* this is for the filter box */}
-      <Card className="">
+    <div className="mx-auto w-full max-w-screen-2xl space-y-8 px-2.5 py-6 md:px-12 lg:px-20 xl:px-28">
+      <Card>
         <CardHeader>
           <CardTitle>Card List</CardTitle>
           <CardDescription>
-            Total Results: {filteredCards?.length ?? 0}
+            Total Results: {cards.length}
           </CardDescription>
         </CardHeader>
         <CardContent>
@@ -293,7 +285,6 @@ export default function Cards() {
             </div>
             <div className="grid grid-cols-2 gap-4">
               <h2 className="text-md text-center">Power</h2>
-              
             </div>
             <Button onClick={handleClear}>
               Clear
@@ -302,23 +293,10 @@ export default function Cards() {
           </div>
         </CardContent>
       </Card>
+      
       <div className="grid grid-cols-4 gap-3 md:grid-cols-4 lg:grid-cols-6 xl:grid-cols-7">
-        {isLoading ? (
-          Array.from({ length: 36 }).map((_, index) => (
-            <Skeleton key={index} className="h-[250px]" />
-          ))
-        ) : (
-          <>
-            {filteredCards.map((card) => (
-              <MyCard key={card.id} card={card} />
-            ))}
-            {isFetchingNextPage &&
-              Array.from({ length: 36 }).map((_, index) => (
-                <Skeleton key={`loading-${index}`} className="h-[275px] rounded-lg"/>
-              ))}
-            <div ref={ref} className="col-span-full h-1" />
-          </>
-        )}
+        {renderCards()}
+        <div ref={ref} className="col-span-full h-1" />
       </div>
     </div>
   );
