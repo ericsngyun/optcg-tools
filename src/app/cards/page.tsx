@@ -83,7 +83,7 @@ export default function Cards() {
   });
 
 
-  const { data, fetchNextPage, hasNextPage, isFetchingNextPage, isLoading, refetch } =
+  const { data, fetchNextPage, hasNextPage, isFetchingNextPage, isLoading } =
     api.card.getCards.useInfiniteQuery(
       {
         limit: 52,
@@ -102,52 +102,53 @@ export default function Cards() {
   const { data: color } = api.color.getColors.useQuery();
   const { data: rarity } = api.rarity.getRarity.useQuery();
 
-  const filteredCards = useMemo(
+  const cards = useMemo(
     () => data?.pages.flatMap((page) => page.items) ?? [],
     [data?.pages],
   );
 
-  // const filteredCards = useMemo(() => {
-  //   if (!cards) return [];
+  const filteredCards = useMemo(() => {
+    if (!cards) return [];
 
-  //   const searchTerm = filterState.search?.toLowerCase() ?? "";
-  //   const effectTerm = filterState.searcheffect?.toLowerCase() ?? "";
+    const searchTerm = filterState.search?.toLowerCase() ?? "";
+    const effectTerm = filterState.searcheffect?.toLowerCase() ?? "";
 
-  //   return cards.filter((card) => {
-  //     // Breaking down conditions for better readability and potential optimization
-  //     if (filterState.set && card.set !== filterState.set) return false;
-  //     if (filterState.attribute && card.attribute !== filterState.attribute)
-  //       return false;
-  //     if (filterState.type && card.type !== filterState.type) return false;
-  //     if (filterState.category && card.category !== filterState.category)
-  //       return false;
-  //     if (filterState.color && card.color !== filterState.color) return false;
-  //     if (filterState.rarity && card.rarity !== filterState.rarity)
-  //       return false;
+    return cards.filter((card) => {
+      // Breaking down conditions for better readability and potential optimization
+      if (filterState.set && card.set !== filterState.set) return false;
+      if (filterState.attribute && card.attribute !== filterState.attribute)
+        return false;
+      if (filterState.type && card.type !== filterState.type) return false;
+      if (filterState.category && card.category !== filterState.category)
+        return false;
+      if (filterState.color && card.color !== filterState.color) return false;
+      if (filterState.rarity && card.rarity !== filterState.rarity)
+        return false;
 
-  //     // Search terms
-  //     const nameMatches =
-  //       !searchTerm ||
-  //       card.name?.toLowerCase().includes(searchTerm) ||
-  //       card.card_id?.toLowerCase().includes(searchTerm);
-  //     if (!nameMatches) return false;
+      // Search terms
+      const nameMatches =
+        !searchTerm ||
+        card.name?.toLowerCase().includes(searchTerm) ||
+        card.card_id?.toLowerCase().includes(searchTerm);
+      if (!nameMatches) return false;
 
-  //     const effectMatches =
-  //       !effectTerm || card.effect?.toLowerCase().includes(effectTerm);
-  //     if (!effectMatches) return false;
+      const effectMatches =
+        !effectTerm || card.effect?.toLowerCase().includes(effectTerm);
+      if (!effectMatches) return false;
 
-  //     // Numeric filters
-  //     if (filterState.power !== null && card.power !== filterState.power)
-  //       return false;
-  //     if (filterState.counter !== null && card.counter !== filterState.counter)
-  //       return false;
+      // Numeric filters
+      if (filterState.power !== null && card.power !== filterState.power)
+        return false;
+      if (filterState.counter !== null && card.counter !== filterState.counter)
+        return false;
 
-  //     return true;
-  //   });
-  // }, [cards, filterState]);
+      return true;
+    });
+  }, [cards, filterState]); 
 
 
   useEffect(() => {
+    if ( filteredCards )
     if (inView && hasNextPage && !isFetchingNextPage) {
       void fetchNextPage();
     }
