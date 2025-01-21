@@ -25,6 +25,7 @@ import { XIcon } from "lucide-react";
 import { toast } from "~/hooks/use-toast";
 import { useInView } from "react-intersection-observer";
 import { useDebounce } from "~/hooks/use-debounce";
+import { FilterSelect } from "../_components/FilterSelect";
 
 type FilterState = {
   set: string | null;
@@ -49,14 +50,16 @@ const SELECT_LABELS = [
   "Rarity",
 ] as const;
 
-const labelToKey = {
+type Label = typeof SELECT_LABELS[number];
+
+const labelToKey: Record<Label, Exclude<keyof FilterState, "search" | "searcheffect">> = {
   Set: "set",
   Attribute: "attribute",
   Type: "type",
   Category: "category",
   Color: "color",
   Rarity: "rarity",
-} as const;
+};
 
 export default function Cards() {
   const { ref, inView } = useInView({
@@ -69,6 +72,7 @@ export default function Cards() {
   const [selectedValues, setSelectedValues] = useState<
     Record<string, string | null>
   >({});
+
   const [filterState, setFilterState] = useState<FilterState>({
     set: null,
     attribute: null,
@@ -172,7 +176,7 @@ export default function Cards() {
   );
 
   const handleSelectChange = useCallback(
-    (key: keyof Omit<FilterState, "search">, value: string) => {
+    (key: Exclude<keyof FilterState, "search" | "searcheffect">, value: string) => {
       setFilterState((prev) => ({
         ...prev,
         [key]: prev[key] === value ? null : value,
@@ -183,7 +187,7 @@ export default function Cards() {
         [key]: prev[key] === value ? null : value,
       }));
     },
-    [],
+    []
   );
   const selectOptions = useMemo(
     () =>
@@ -192,26 +196,13 @@ export default function Cards() {
         const key = labelToKey[label];
 
         return (
-          <Select
-            key={index}
-            value={selectedValues[key] ?? undefined}
-            onValueChange={(value) => handleSelectChange(key, value)}
-          >
-            <SelectTrigger className="w-full">
-              <SelectValue placeholder={`Select ${label}`} />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectGroup>
-                <SelectLabel>{label}</SelectLabel>
-                {Array.isArray(group) &&
-                  group.map((value) => (
-                    <SelectItem key={value.id} value={value.id}>
-                      {value.name}
-                    </SelectItem>
-                  ))}
-              </SelectGroup>
-            </SelectContent>
-          </Select>
+          <FilterSelect
+            key={label}
+            label={label}
+            value={selectedValues[key] ?? null}
+            options={group ?? []}
+            onChange={(value) => handleSelectChange(key, value)}
+          />
         );
       }),
     [selectGroup, handleSelectChange, selectedValues],

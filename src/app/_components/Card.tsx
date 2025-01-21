@@ -40,8 +40,8 @@ const MyCard: React.FC<CardProps> = ({ card }) => {
           <NextImage
             src={card.Image.image_url}
             alt="card image"
-            height={500}
-            width={250}
+            height={100}
+            width={100}
           />
         ) : (
           <div>No image available</div>
