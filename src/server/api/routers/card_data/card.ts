@@ -1,9 +1,9 @@
 import { z } from "zod";
-
 import {
   createTRPCRouter,
   publicProcedure,
 } from "~/server/api/trpc";
+import { Prisma } from "@prisma/client";
 
 export const cardRouter = createTRPCRouter({
   getCards: publicProcedure
@@ -31,14 +31,24 @@ export const cardRouter = createTRPCRouter({
         take: limit + 1,
         cursor: cursor ? { id: cursor } : undefined,
         where: {
-          // Apply filtering logic based on the filters object
+          // Existing filters
           ...(filters?.set && { set: filters.set }),
           ...(filters?.attribute && { attribute: filters.attribute }),
           ...(filters?.type && { type: filters.type }),
           ...(filters?.category && { category: filters.category }),
           ...(filters?.color && { color: filters.color }),
           ...(filters?.rarity && { rarity: filters.rarity }),
-          // Add search logic if needed
+        
+          // Add search filters
+          ...(filters?.search && {
+            OR: [
+              { name: { contains: filters.search, mode: Prisma.QueryMode.insensitive } },
+              { card_id: { contains: filters.search, mode: Prisma.QueryMode.insensitive } }
+            ]
+          }),
+          ...(filters?.searcheffect && {
+            effect: { contains: filters.searcheffect, mode: Prisma.QueryMode.insensitive }
+          })
         },
         // Include any necessary relations
         include: {
@@ -70,3 +80,4 @@ export const cardRouter = createTRPCRouter({
     }),
     
 });
+

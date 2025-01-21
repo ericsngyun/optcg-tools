@@ -82,6 +82,9 @@ export default function Cards() {
     cost: null,
   });
 
+  const debouncedNameInput = useDebounce(nameInput, 300);
+  const debouncedEffectInput = useDebounce(effectInput, 300);
+
 
   const { data, fetchNextPage, hasNextPage, isFetchingNextPage, isLoading } =
     api.card.getCards.useInfiniteQuery(
@@ -146,9 +149,17 @@ export default function Cards() {
     });
   }, [cards, filterState]); 
 
+  useEffect(() => {
+    setFilterState(prev => ({
+      ...prev,
+      search: debouncedNameInput || null,
+      searcheffect: debouncedEffectInput || null
+    }));
+  }, [debouncedNameInput, debouncedEffectInput]);
+
+
 
   useEffect(() => {
-    if ( filteredCards )
     if (inView && hasNextPage && !isFetchingNextPage) {
       void fetchNextPage();
     }
@@ -205,29 +216,13 @@ export default function Cards() {
     [selectGroup, handleSelectChange, selectedValues],
   );
 
-  const handleNameInputChange = useCallback(
-    (e: React.ChangeEvent<HTMLInputElement>) => {
-      const value = e.target.value;
-      setNameInput(value);
-      setFilterState((prev) => ({
-        ...prev,
-        search: value,
-      }));
-    },
-    [],
-  );
+  const handleNameInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setNameInput(e.target.value);
+  };
 
-  const handleEffectInputChange = useCallback(
-    (e: React.ChangeEvent<HTMLInputElement>) => {
-      const value = e.target.value;
-      setEffectInput(value);
-      setFilterState((prev) => ({
-        ...prev,
-        searcheffect: value,
-      }));
-    },
-    [],
-  );
+  const handleEffectInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setEffectInput(e.target.value);
+  };
 
   const handleClear = useCallback(() => {
     setFilterState({
@@ -315,4 +310,20 @@ export default function Cards() {
       </div>
     </div>
   );
+}
+
+function useDebounce<T>(value: T, delay: number): T {
+  const [debouncedValue, setDebouncedValue] = useState(value);
+
+  useEffect(() => {
+    const handler = setTimeout(() => {
+      setDebouncedValue(value);
+    }, delay);
+
+    return () => {
+      clearTimeout(handler);
+    };
+  }, [value, delay]);
+
+  return debouncedValue;
 }
