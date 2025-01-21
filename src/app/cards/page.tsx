@@ -24,6 +24,7 @@ import { Button } from "~/components/ui/button";
 import { XIcon } from "lucide-react";
 import { toast } from "~/hooks/use-toast";
 import { useInView } from "react-intersection-observer";
+import { useDebounce } from "~/hooks/use-debounce";
 
 type FilterState = {
   set: string | null;
@@ -312,18 +313,3 @@ export default function Cards() {
   );
 }
 
-function useDebounce<T>(value: T, delay: number): T {
-  const [debouncedValue, setDebouncedValue] = useState(value);
-
-  useEffect(() => {
-    const handler = setTimeout(() => {
-      setDebouncedValue(value);
-    }, delay);
-
-    return () => {
-      clearTimeout(handler);
-    };
-  }, [value, delay]);
-
-  return debouncedValue;
-}
