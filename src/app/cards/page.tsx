@@ -243,62 +243,86 @@ export default function Cards() {
   // Update the renderCards function to use filteredCards
   const renderCards = useCallback(() => {
     if (isLoading) {
-      return Array.from({ length: 52 }).map((_, index) => (
-        <Skeleton key={`skeleton-${index}`} className="h-[250px]" />
+      return Array.from({ length: 12 }).map((_, index) => (
+        <Skeleton
+          key={`skeleton-${index}`}
+          className="aspect-[2/3] h-auto w-full rounded-xl"
+        />
       ));
     }
-
+  
     return (
       <>
         {filteredCards.map((card) => (
-          <MyCard key={card.Image?.image_url} card={card} />
+          <MyCard key={card.card_id} card={card} />
         ))}
         {isFetchingNextPage &&
-          Array.from({ length: 52 }).map((_, index) => (
-            <Skeleton key={`loading-${index}`} className="h-[275px] rounded-lg" />
+          Array.from({ length: 12 }).map((_, index) => (
+            <Skeleton
+              key={`loading-${index}`}
+              className="aspect-[2/3] h-auto w-full rounded-xl"
+            />
           ))}
       </>
     );
   }, [filteredCards, isLoading, isFetchingNextPage]);
+  
 
   return (
-    <div className="mx-auto w-full max-w-screen-2xl space-y-8 px-2.5 py-6 md:px-12 lg:px-20 xl:px-28">
-      <Card>
-        <CardHeader>
-          <CardTitle>Card List</CardTitle>
-          <CardDescription>Total Results: {filteredCards.length}</CardDescription>
+    <div className="mx-auto w-full max-w-screen-2xl space-y-4 px-2 py-3 sm:space-y-6 sm:px-4 sm:py-4 md:space-y-8 md:px-6 md:py-6">
+      {/* Filter Card */}
+      <Card className="rounded-lg">
+        <CardHeader className="px-3 py-2 sm:p-4 md:p-6">
+          <div className="flex flex-col justify-between gap-3 sm:flex-row sm:items-center">
+            <div>
+              <CardTitle className="text-xl font-bold sm:text-2xl">
+                Card List
+              </CardTitle>
+              <CardDescription className="mt-1 text-sm sm:text-base">
+                Total Results: {filteredCards.length}
+              </CardDescription>
+            </div>
+            <Button
+              onClick={handleClear}
+              variant="outline"
+              className="mt-2 w-full sm:mt-0 sm:w-auto"
+              size="sm"
+            >
+              Clear Filters
+              <XIcon className="ml-2 h-3 w-3 sm:h-4 sm:w-4" />
+            </Button>
+          </div>
         </CardHeader>
-        <CardContent>
-          <div className="space-y-4">
-            <div className="grid grid-cols-2 gap-4">
+        <CardContent className="px-3 py-2 sm:p-4 md:p-6">
+          <div className="space-y-3 sm:space-y-4">
+            {/* Search Inputs */}
+            <div className="grid gap-3 sm:grid-cols-2">
               <Input
                 value={nameInput}
                 onChange={handleNameInputChange}
-                type="text"
-                placeholder="Name/Code"
+                placeholder="Search by Name/Code"
+                className="h-10 rounded-lg sm:h-12"
               />
               <Input
                 value={effectInput}
                 onChange={handleEffectInputChange}
-                type="text"
-                placeholder="Effect"
+                placeholder="Search by Effect"
+                className="h-10 rounded-lg sm:h-12"
               />
             </div>
-            <div className="grid grid-cols-3 gap-4">{selectOptions}</div>
-            <div className="grid grid-cols-2 gap-4">
-              <h2 className="text-md text-center">Power</h2>
+
+            {/* Filter Selects */}
+            <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-3">
+              {selectOptions}
             </div>
-            <Button onClick={handleClear}>
-              Clear
-              <XIcon />
-            </Button>
           </div>
         </CardContent>
       </Card>
 
-      <div className="grid grid-cols-4 gap-3 md:grid-cols-4 lg:grid-cols-6 xl:grid-cols-7">
+      {/* Card Grid */}
+      <div className="grid grid-cols-3 gap-1.5 sm:gap-2 md:grid-cols-4 md:gap-3 lg:grid-cols-5 xl:grid-cols-6 2xl:grid-cols-7">
         {renderCards()}
-        <div ref={ref} className="col-span-full h-1" />
+        <div ref={ref} className="col-span-full h-2" />
       </div>
     </div>
   );
