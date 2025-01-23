@@ -32,12 +32,12 @@ export const cardRouter = createTRPCRouter({
         cursor: cursor ? { id: cursor } : undefined,
         where: {
           // Existing filters
-          ...(filters?.set && { set: filters.set }),
-          ...(filters?.attribute && { attribute: filters.attribute }),
-          ...(filters?.type && { type: filters.type }),
-          ...(filters?.category && { category: filters.category }),
-          ...(filters?.color && { color: filters.color }),
-          ...(filters?.rarity && { rarity: filters.rarity }),
+          ...(filters?.set ? { set: filters.set }: undefined ),
+          ...(filters?.attribute ? { attribute: filters.attribute }: undefined),
+          ...(filters?.type ? { type: filters.type }: undefined),
+          ...(filters?.category ? { category: filters.category }: undefined),
+          ...(filters?.color ? { color: filters.color }: undefined),
+          ...(filters?.rarity ? { rarity: filters.rarity }: undefined),
         
           // Add search filters
           ...(filters?.search && {
@@ -60,9 +60,10 @@ export const cardRouter = createTRPCRouter({
           Color: true,
           Type: true,
         },
-        orderBy: {
-          card_id: 'asc' as const,
-        },
+        orderBy: [
+          {card_id: 'asc' as const},
+          {name: 'asc' as const}
+        ],
       };
 
       const items = await ctx.db.card.findMany(query);

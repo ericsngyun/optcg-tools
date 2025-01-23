@@ -1,6 +1,6 @@
 "use client";
 import React, { useState, useMemo, useCallback, useEffect } from "react";
-import { api } from "~/trpc/react";
+import { api, type RouterOutputs } from "~/trpc/react";
 import MyCard from "../_components/Card";
 import {
   Card,
@@ -9,15 +9,6 @@ import {
   CardHeader,
   CardTitle,
 } from "~/components/ui/card";
-import {
-  Select,
-  SelectContent,
-  SelectGroup,
-  SelectItem,
-  SelectLabel,
-  SelectTrigger,
-  SelectValue,
-} from "~/components/ui/select";
 import { Input } from "~/components/ui/input";
 import { Skeleton } from "~/components/ui/skeleton";
 import { Button } from "~/components/ui/button";
@@ -66,7 +57,7 @@ export default function Cards() {
     threshold: 0,
     rootMargin: "400px",
   });
-
+  const utils = api.useUtils()
   const [nameInput, setNameInput] = useState("");
   const [effectInput, setEffectInput] = useState("");
   const [selectedValues, setSelectedValues] = useState<
@@ -90,12 +81,15 @@ export default function Cards() {
   const debouncedNameInput = useDebounce(nameInput, 300);
   const debouncedEffectInput = useDebounce(effectInput, 300);
 
-
   const { data, fetchNextPage, hasNextPage, isFetchingNextPage, isLoading } =
     api.card.getCards.useInfiniteQuery(
       {
         limit: 52,
-        filters: filterState,
+        filters: {
+          ...filterState,
+          search: filterState.search ?? '',
+          searcheffect: filterState.searcheffect ?? '',
+        }
       },
       {
         getNextPageParam: (lastPage) => lastPage.nextCursor,
@@ -114,61 +108,29 @@ export default function Cards() {
     () => data?.pages.flatMap((page) => page.items) ?? [],
     [data?.pages],
   );
-
-  const filteredCards = useMemo(() => {
-    if (!cards) return [];
-
-    const searchTerm = filterState.search?.toLowerCase() ?? "";
-    const effectTerm = filterState.searcheffect?.toLowerCase() ?? "";
-
-    return cards.filter((card) => {
-      // Breaking down conditions for better readability and potential optimization
-      if (filterState.set && card.set !== filterState.set) return false;
-      if (filterState.attribute && card.attribute !== filterState.attribute)
-        return false;
-      if (filterState.type && card.type !== filterState.type) return false;
-      if (filterState.category && card.category !== filterState.category)
-        return false;
-      if (filterState.color && card.color !== filterState.color) return false;
-      if (filterState.rarity && card.rarity !== filterState.rarity)
-        return false;
-
-      // Search terms
-      const nameMatches =
-        !searchTerm ||
-        card.name?.toLowerCase().includes(searchTerm) ||
-        card.card_id?.toLowerCase().includes(searchTerm);
-      if (!nameMatches) return false;
-
-      const effectMatches =
-        !effectTerm || card.effect?.toLowerCase().includes(effectTerm);
-      if (!effectMatches) return false;
-
-      // Numeric filters
-      if (filterState.power !== null && card.power !== filterState.power)
-        return false;
-      if (filterState.counter !== null && card.counter !== filterState.counter)
-        return false;
-
-      return true;
-    });
-  }, [cards, filterState]); 
+  // useEffect(() => {
+  //   utils.card.getCards.invalidate()
+  //     .catch((err) => console.log(err))
+  // }, [filterState, utils])
 
   useEffect(() => {
     setFilterState(prev => ({
       ...prev,
-      search: debouncedNameInput || null,
-      searcheffect: debouncedEffectInput || null
+      search: debouncedNameInput || '',
+      searcheffect: debouncedEffectInput || ''
     }));
   }, [debouncedNameInput, debouncedEffectInput]);
 
-
+  // useEffect(() => {
+  //   utils.card.getCards.setInfiniteData({}, () => undefined)
+  // })
 
   useEffect(() => {
     if (inView && hasNextPage && !isFetchingNextPage) {
-      void fetchNextPage();
+      // Add slight delay to prevent duplicate fetches
+        void fetchNextPage();
     }
-  }, [inView, fetchNextPage, hasNextPage, isFetchingNextPage]);
+  }, [inView, hasNextPage, isFetchingNextPage, fetchNextPage]);
 
   const selectGroup = useMemo(
     () => [set, attribute, type, category, color, rarity] as const,
@@ -189,6 +151,7 @@ export default function Cards() {
     },
     []
   );
+
   const selectOptions = useMemo(
     () =>
       selectGroup.map((group, index) => {
@@ -233,40 +196,47 @@ export default function Cards() {
     setNameInput("");
     setEffectInput("");
     setSelectedValues({});
+    
+    utils.card.getCards.invalidate()
+      .catch((err) => console.error('Failed to invalidate queries:', err));
 
     toast({
       variant: "destructive",
       title: "Cleared filters",
     });
-  }, []);
+  }, [utils]);
 
-  // Update the renderCards function to use filteredCards
   const renderCards = useCallback(() => {
-    if (isLoading) {
-      return Array.from({ length: 12 }).map((_, index) => (
+    if (isLoading && !data) {
+      return Array.from({ length: 52 }).map((_, index) => (
         <Skeleton
           key={`skeleton-${index}`}
           className="aspect-[2/3] h-auto w-full rounded-xl"
         />
       ));
     }
+
+
+    if (!cards.length) {
+      return <div className="col-span-full text-center">No cards found</div>;
+    }
   
     return (
       <>
-        {filteredCards.map((card) => (
+        {cards.map((card) => (
           <MyCard key={card.card_id} card={card} />
         ))}
-        {isFetchingNextPage &&
-          Array.from({ length: 12 }).map((_, index) => (
-            <Skeleton
-              key={`loading-${index}`}
+        {isFetchingNextPage && (
+          Array.from({ length: 52 }).map((_, index) => (
+            <Skeleton 
+              key={`skeleton-${index}`}
               className="aspect-[2/3] h-auto w-full rounded-xl"
             />
-          ))}
+          ))
+        )}
       </>
     );
-  }, [filteredCards, isLoading, isFetchingNextPage]);
-  
+  }, [cards, isLoading, isFetchingNextPage, data]);
 
   return (
     <div className="mx-auto w-full max-w-screen-2xl space-y-4 px-2 py-3 sm:space-y-6 sm:px-4 sm:py-4 md:space-y-8 md:px-6 md:py-6">
@@ -279,7 +249,7 @@ export default function Cards() {
                 Card List
               </CardTitle>
               <CardDescription className="mt-1 text-sm sm:text-base">
-                Total Results: {filteredCards.length}
+                Total Results: {cards.length}
               </CardDescription>
             </div>
             <Button
@@ -321,7 +291,7 @@ export default function Cards() {
 
       {/* Card Grid */}
       <div className="grid grid-cols-3 gap-1.5 sm:gap-2 md:grid-cols-4 md:gap-3 lg:grid-cols-5 xl:grid-cols-6 2xl:grid-cols-7">
-        {renderCards()}
+        {/* {renderCards()} */}
         <div ref={ref} className="col-span-full h-2" />
       </div>
     </div>
