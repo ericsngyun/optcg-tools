@@ -261,7 +261,7 @@ export default function Cards() {
               Clear Filters
               <XIcon className="ml-2 h-3 w-3 sm:h-4 sm:w-4" />
             </Button>
-          </div>
+          </div> 
         </CardHeader>
         <CardContent className="px-3 py-2 sm:p-4 md:p-6">
           <div className="space-y-3 sm:space-y-4">

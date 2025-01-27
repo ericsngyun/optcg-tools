@@ -1,0 +1,21 @@
+export const decklists = [
+      `
+      1xOP01-060
+      4xST03-005
+      3xST03-004
+      4xOP01-077
+      1xOP03-044
+      3xOP06-047
+      4xEB01-023
+      4xOP07-040
+      4xOP07-045
+      4xOP07-046
+      4xST17-002
+      2xST17-003
+      4xST17-004
+      4xST17-005
+      1xOP02-068
+      2xOP06-058
+      2xOP07-057
+    `.trim()
+]

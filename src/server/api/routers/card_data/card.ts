@@ -79,6 +79,23 @@ export const cardRouter = createTRPCRouter({
         nextCursor,
       };
     }),
-    
+
+
+
+    getCardDetails: publicProcedure
+      .input(z.string()) // card_id
+      .query(async ({ ctx, input }) => {
+        const cardDetails = ctx.db.card.findMany(
+          {
+            where: {
+              card_id: input,
+              is_alt_art: '-'
+            }
+          }
+        )
+
+        return cardDetails
+      })
+       
 });
 
