@@ -80,22 +80,21 @@ export const cardRouter = createTRPCRouter({
       };
     }),
 
-
-
     getCardDetails: publicProcedure
-      .input(z.string()) // card_id
+      .input(z.array(z.object({
+        card_id: z.string() // Only card_id is required
+      }))) // Accept an array of objects with card_id
       .query(async ({ ctx, input }) => {
-        const cardDetails = ctx.db.card.findMany(
-          {
-            where: {
-              card_id: input,
-              is_alt_art: '-'
-            }
-          }
-        )
+        const cardIds = input.map(entry => entry.card_id); // Extract card_ids from input
 
-        return cardDetails
+        const cardDetails = await ctx.db.card.findMany({
+          where: {
+            card_id: { in: cardIds }, // Use 'in' to find all matching card_ids
+            is_alt_art: '-' // Keep the existing filter
+          }
+        });
+        
+        return cardDetails;
       })
-       
 });
 
