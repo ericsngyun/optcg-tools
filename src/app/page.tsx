@@ -12,7 +12,6 @@ export default async function Home() {
     <HydrateClient>
       <MaxWidthWrapper className="py-8">
         <div className="flex justify-center">
-          <h1>HELLO</h1>
           <FeaturedDecks/>
         </div>
       </MaxWidthWrapper>

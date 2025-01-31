@@ -18,8 +18,8 @@ const FeaturedDecks = () => {
 
   return (
     <div>
-      {deckLists.map(() => (
-        // <Image key={}/>
+      {deckLists.map((deck, index) => (
+        <div key={deck.card_id}>test</div>
       ))}
     </div>
   )

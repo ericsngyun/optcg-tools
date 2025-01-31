@@ -17,5 +17,23 @@ export const decklists = [
       1xOP02-068
       2xOP06-058
       2xOP07-057
-    `.trim()
+    `.trim(),
+      `
+      1xOP09-001
+      4xOP01-006
+      2xOP01-013
+      4xOP03-013
+      3xST15-005
+      1xOP06-007
+      4xOP07-015
+      4xOP08-118
+      4xOP09-004
+      3xOP09-005
+      4xOP09-009
+      4xOP09-011
+      4xOP09-014
+      1xOP09-118
+      4xOP01-026
+      2xOP01-029
+      2xST01-014`.trim()
 ]
